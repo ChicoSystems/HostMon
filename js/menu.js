@@ -15,6 +15,9 @@ $(document).ready(function() {
 		//menuTimeout = setTimeout(setMenuConfigInfo, 5000);
 		$('nav').addClass('open');
 		$('body').addClass('menu-open');
+		
+		//If tour is running, have it advance when menu is open.
+		tour.next();
 		return false;
 	});
 

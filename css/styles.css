@@ -480,6 +480,7 @@ nav.open.top {
 /* accordion header */
 #accordion h2 {
     /*background:#51bbff url(/media/img/gradient/h30.png);*/
+    text-align: center;
     line-height: 12px;
     margin:0;
     padding:5px 15px;

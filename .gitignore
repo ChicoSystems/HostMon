@@ -2,3 +2,4 @@
 /bin
 /cfg/java.cfg
 *.log
+/cfg/db.cfg

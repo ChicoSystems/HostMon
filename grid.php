@@ -31,7 +31,7 @@ if(isset($_GET['login'])){ //if login has just logged us in
 		$loggedIn = true;
 	}
 }
-$pageTitle = "Hostmon - ".$userName;
+$pageTitle = $adminLevel."Hostmon - ".$userName;
 $devices = getActiveDevices($userName); // returns the initial active devices
 $gridPositions = getGridPositions(count($devices)); // returns a 2d array with initial grid positions and sizes 
 ?>
@@ -44,8 +44,9 @@ $gridPositions = getGridPositions(count($devices)); // returns a 2d array with i
 		<title><?php echo $pageTitle ?></title>
 		<link rel="stylesheet" type="text/css" href="css/gridster.css">
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
-        <link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
-		<a class="menu" href="#">
+		<link href="css/bootstrap-tour-standalone.css" rel="stylesheet">
+                <link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
+		<a class="menu" href="#" id="tour-menu">
 			<div class="bar"></div>
 			<div class="bar"></div>
 			<div class="bar"></div>
@@ -87,7 +88,7 @@ $gridPositions = getGridPositions(count($devices)); // returns a 2d array with i
 							<div id="statusmark"></div>
                         </div>
 					</li> -->
-					 <li data-row="7" data-col="12" data-sizex="1" data-sizey="1" id="newDeviceOpener">
+					 <li data-row="7" data-col="1" data-sizex="1" data-sizey="1" id="newDeviceOpener">
                     	<div id="addNewDeviceImageContainer">
                     		<img src="images/plus.png" id="addNewDeviceImage">
                         </div>
@@ -122,11 +123,15 @@ $gridPositions = getGridPositions(count($devices)); // returns a 2d array with i
 <script src="js/menu.js"></script>
 <script src="js/hostmonChart.js"></script>
 <script type="text/javascript" src="js/jquery.gridster.min.js" charster="utf-8"></script>
+<script src="js/bootstrap-tour-standalone.min.js"></script>
 
 <script type="text/javascript">
 var gridster = 0;
 var dragged = 0; // Used to keep the device.php overlay from loading when a grid is being dragged.
 var gridGraphTimeOut; //Used to disable ajax updating of the page when device.php is overlayed.
+var tour; //used to construct tours
+var overlay; //Overlay used to display device.
+var adminLevel = <?php echo $adminLevel; ?>;
 	
 //Initialize Gridster
 gridster = $("#frontGrid > ul").gridster({
@@ -139,6 +144,7 @@ gridster = $("#frontGrid > ul").gridster({
 		}
 	} 
 }).data('gridster');	
+
 
 var onMouseWheel = function(e) {
 	var browser = $.browser;
@@ -167,6 +173,7 @@ for(i = 0; i < c.length; i++){
     colorCanvas(canvas, "#51bbff");
     drawGraph(canvas);
 }
+
 
 // Separates a string in ajax. Probably Used for adding a new device?		
 function getMessage(result){
@@ -313,7 +320,7 @@ $('.shrink').on('click', function(event) {
 }); //End of Shrink event.
 
 // Event Called when user opens a device. This load's and overlays the device.php page over grid.php.			  
-$("li[rel]").overlay({
+overlay = $("li[rel]").overlay({
 	top:top,
 	mask: 'darkred',
 	effect: 'apple',
@@ -342,8 +349,14 @@ $("li[rel]").overlay({
 					dragged = 1;
 				}
 			}
-		}).data('gridster');	
-	}// End onClose.
+		}).data('gridster');
+		tour.next();	
+	},// End onClose.
+	onLoad: function() {
+//	tour.redraw();
+		if(true) tour.next();
+	},
+	api: true
 }); // End overlay Event.
 		
 // Contructs and adds a new device dialog to the screen.
@@ -357,13 +370,14 @@ $( "#newDeviceDialog" ).dialog({
 		effect: "explode",
 		duration: 1000
 	},
-	buttons: [ { text: "Add Device", click: function() { addNewDevice(this); } } ]
+	buttons: [ { text: "Add Device", id: "addDeviceButton", click: function() { addNewDevice(this); } } ]
 }); //End of newDeviceDialog.
 
 // Handles when a user clicks on the new Device Button.
 $( "#newDeviceOpener" ).click( function(event) {
 	//alert("newDeviceOpening");
 	$( "#newDeviceDialog" ).dialog( "open" ); // Opens the new device dialog.
+	tour.next();
 }); // End of newDeviceOpener click handler
 
 // Event Handler called when document is first loaded. Intializes the update of the grid graphs.
@@ -371,6 +385,409 @@ $(document).ready(function() {
 	setTimeout('updateGridGraphs()',10);
 	//alert("about to set menu config info");
 	setMenuConfigInfo(true); //we don't want it to start repeating
+
+tour = new Tour({
+ debug: true,
+  steps: [
+  {
+    element: "#tour-menu",
+    title: "Welcome To Hostmon!",
+    content: "You can use hostmon to continously monitor the latency to any device on the public internet."
+  },
+  {
+    element: "#newDeviceOpener",
+    title: "Adding A Device",
+    content: "Click the + symbol to add a new device.",
+    onShow: function(){
+      //we want to close the $newDeviceDialog incaase its open from the next step of the tour
+      $("#newDeviceDialog").dialog("close");
+    }
+  },
+  {
+    element: "#deviceName",
+    title: "Insert Device Name",
+    content: "This is the name you will be referring to this device by in Hostmon.",
+    onShow: function(){
+     $( "#newDeviceDialog" ).dialog( "open" ); // Opens the new device dialog.
+    }
+  },
+  {
+    element: '#deviceIP',
+    title: "Insert Ip / Hostname",
+    content: "This can be an IP, Hostname, or Domain name. Anything you can ping should work."
+  },
+  {
+    element: '#deviceNote',
+    title: "Make A Note About Device",
+    content: "Make a note to help yourself remember why you are adding this device. This note will show in the device page."
+  },
+  {
+    element: '#addDeviceButton',
+    title: "Click Add Device",
+    content: "The device you added will starting being monitored immediately."
+  },
+  {
+    element: '#first',
+    title: "You first Device",
+    content: "Each Device Box shows you the status of that device at a glance.",
+    onShow: function(){
+      $("#newDeviceDialog").dialog("close");
+    }
+  },
+  {
+    element: '#first',
+    placement: "bottom",
+    title: "Resizing",
+    content: "Use the White arrows to resize the box. You can also drag and drop all boxes to different locations.",
+    onShow: function(){
+      $("#newDeviceDialog").dialog("close");
+    }
+  },
+  {
+    element: '#first',
+    title: "Click the Graph",
+    content: "This will bring up the device page. ",
+    
+    template: "<div class='popover tour'> \
+	      <div class='arrow'></div> \
+ 	      <h3 class='popover-title'></h3> \
+              <div class='popover-content'></div> \
+              <div class='popover-navigation'> \
+              <button class='btn btn-default' data-role='prev'>« Prev</button> \
+              <span data-role='separator'>|</span> \
+              <button class='btn btn-default' data-role='end'>End tour</button> \
+  		</div> \
+		</div>",
+  },
+  {
+    element: '#FiveMinuteLine',
+    title: "5 Minute Graph",
+    content: "The 5 Minute graph shows the last 5 minutes of history in 15 second increments.",
+  },
+  {
+    title: "Hourly Graph",
+    content: "Click here to pull up the Hourly graph. The Hourly graph shows the last Hour of history in 5 minute increments.",
+     template: "<div class='popover tour'> \
+              <div class='arrow'></div> \
+              <h3 class='popover-title'></h3> \
+              <div class='popover-content'></div> \
+              <div class='popover-navigation'> \
+              <button class='btn btn-default' data-role='prev'>« Prev</button> \
+              <span data-role='separator'>|</span> \
+              <button class='btn btn-default' data-role='end'>End tour</button> \
+                </div> \
+                </div>",
+
+    placement: "bottom"
+  },
+  {
+    element: '#dayLineHandle',
+    title: "Daily Graph",
+    content: "Click here to pull up the Daily Graph. The Daily Graph shows the last Day of History in Hourly increments.",
+    placement: "bottom",
+     template: "<div class='popover tour'> \
+              <div class='arrow'></div> \
+              <h3 class='popover-title'></h3> \
+              <div class='popover-content'></div> \
+              <div class='popover-navigation'> \
+              <button class='btn btn-default' data-role='prev'>« Prev</button> \
+              <span data-role='separator'>|</span> \
+              <button class='btn btn-default' data-role='end'>End tour</button> \
+                </div> \
+                </div>",
+  },
+  {
+    element: '#FiveMinutePolar',
+    title: "Five Minute Polar Chart",
+    content: "This chart gives quick reference so we can see the distribution of values at a glance.",
+    placement: "left"
+  },
+  {
+    element: '#hourPolarHandle',
+    title: "Click Hourly Polar Graph",
+    content: "The hourly Polar Graph gives us a quick reference so we can see the hourly distribution of values at a glance.",
+     template: "<div class='popover tour'> \
+              <div class='arrow'></div> \
+              <h3 class='popover-title'></h3> \
+              <div class='popover-content'></div> \
+              <div class='popover-navigation'> \
+              <button class='btn btn-default' data-role='prev'>« Prev</button> \
+              <span data-role='separator'>|</span> \
+              <button class='btn btn-default' data-role='end'>End tour</button> \
+                </div> \
+                </div>",
+
+    placement: "left"
+  },
+  {
+    element: '#dayPolarHandle',
+    title: "Click Day Polar Graph",
+    content: "The daily Polar Graph gives us a quick reference so we can see the daily distribution of values at a glance.",
+     template: "<div class='popover tour'> \
+              <div class='arrow'></div> \
+              <h3 class='popover-title'></h3> \
+              <div class='popover-content'></div> \
+              <div class='popover-navigation'> \
+              <button class='btn btn-default' data-role='prev'>« Prev</button> \
+              <span data-role='separator'>|</span> \
+              <button class='btn btn-default' data-role='end'>End tour</button> \
+                </div> \
+                </div>",
+
+    placement: "left"
+  },
+  {
+    element: '.plus',
+    title: "Click + to Add Notes",
+    content: "Adding notes is useful for tracking issues with a device. Notes can be left and reviewed for every use. Click the + button to start adding a new note now.",
+     template: "<div class='popover tour'> \
+              <div class='arrow'></div> \
+              <h3 class='popover-title'></h3> \
+              <div class='popover-content'></div> \
+              <div class='popover-navigation'> \
+              <button class='btn btn-default' data-role='prev'>« Prev</button> \
+              <span data-role='separator'>|</span> \
+              <button class='btn btn-default' data-role='end'>End tour</button> \
+                </div> \
+                </div>",
+
+    placement: "bottom"
+  },
+  {
+    element: '#noteInputText',
+    title: "Input Your Note Here",
+    content: "Input any notes or observations you have about this device here.",
+    placement: "left"
+  },
+  {
+    element: '#noteSubmitButton',
+    title: "Click Submit to submit note.",
+    content: "This note will be viewable by all other users.",
+     template: "<div class='popover tour'> \
+              <div class='arrow'></div> \
+              <h3 class='popover-title'></h3> \
+              <div class='popover-content'></div> \
+              <div class='popover-navigation'> \
+              <button class='btn btn-default' data-role='prev'>« Prev</button> \
+              <span data-role='separator'>|</span> \
+              <button class='btn btn-default' data-role='end'>End tour</button> \
+                </div> \
+                </div>",
+
+    placement: "bottom"
+  },
+  {
+    element: 'a.close',
+    title: "Click the X to close this device.",
+    content: "All devices are monitored in the background all the time. Click the X and you will be able to explore other devices.",
+     template: "<div class='popover tour'> \
+              <div class='arrow'></div> \
+              <h3 class='popover-title'></h3> \
+              <div class='popover-content'></div> \
+              <div class='popover-navigation'> \
+              <button class='btn btn-default' data-role='prev'>« Prev</button> \
+              <span data-role='separator'>|</span> \
+              <button class='btn btn-default' data-role='end'>End tour</button> \
+                </div> \
+                </div>",
+
+    placement: "left",
+  },
+  {
+    element: "#onlineDot",
+    title: "Backend Indicator",
+    content: "Indicator Light shows Green when the backend is running, and red when it is not.",
+    placement: "bottom"
+  },
+  {
+    element: '#tour-menu',
+    title: "Click the Menu Icon",
+    content: "The menu gives you the ability to adjust account and machine settings.",
+     template: "<div class='popover tour'> \
+              <div class='arrow'></div> \
+              <h3 class='popover-title'></h3> \
+              <div class='popover-content'></div> \
+              <div class='popover-navigation'> \
+              <button class='btn btn-default' data-role='prev'>« Prev</button> \
+              <span data-role='separator'>|</span> \
+              <button class='btn btn-default' data-role='end'>End tour</button> \
+                </div> \
+                </div>",
+
+    placement: "left",
+  },
+  {
+    element: ".changePassword2",
+    title: "Change Password",
+    content: "You can change your password here. Input your new password two times, and click the set button. The password field will blink blue if your password has been changed successfully, and it will blink red if not.",
+    placement: "bottom"
+  }
+
+]});
+
+//Check if user is an admin, if they are then show them the admin tour of the menu.
+if(adminLevel == 10){
+
+//Since we already have some of the data we want encoded at the title attirbute of several
+//menu options, we are just going to grab that info straight from the DOM and display
+//it in our tour.
+var avgGoalTitle = $("#avgGoalTitle").attr("title");
+var startingThreadsTitle = $("#startingThreadsTitle").attr("title");
+var maxThreadsTitle = $("#maxThreadsTitle").attr("title");
+var tRemovalTitle = $("#tRemovalTitle").attr("title");
+var tAddTitle = $("#tAddTitle").attr("title");
+var runsPerThreadTitle = $("#runsPerThreadTitle").attr("title");
+var pingsDBTitle = $("#pingsDBTitle").attr("title");
+var minuteAgeTitle = $("#minuteAgeTitle").attr("title");
+var hourAgeTitle = $("#hourAgeTitle").attr("title");
+var dayAgeTitle = $("#dayAgeTitle").attr("title");
+var weekAgeTitle = $("#weekAgeTitle").attr("title");
+var pingMinuteTitle = $("#pingMinuteTitle").attr("title");
+var pingHourTitle = $("#pingHourTitle").attr("title");
+var pingDayTitle = $("#pingDayTitle").attr("title");
+var pingWeekTitle = $("#pingDayTitle").attr("title");
+	tour.addStep({
+		element: "#stopStartButton",
+		title: "Start/Stop the Backend.",
+		content: "<font color='red'>Admin Only Option.</font> <br> Hit the start button and a command will be sent to the backend to start. <br> Hit the stop button and a command will be sent to the backend to stop. <br> If succussfully started the Message 'Backend Started' will flash in green letters. <br> If succussfully stopped the words 'Backend Stopped' will flash in red.",
+		placement: "right"
+	});
+	tour.addStep({
+                element: ".adminLvl",
+                title: "Add New User",
+                content: "<font color='red'>Admin Only Option.</font> <br> Set username and password. <br> <br> Admin LVL's: <br> 0: Unapproved sign up. - This user cannot yet login. <br> 1 - 9: Normal Users - Cannot access admin functions. <br> 10: Admin - Can do anything.",
+                placement: "bottom"
+        });
+
+	tour.addStep({
+                element: ".removeUserErrorOutput",
+                title: "Remove User",
+                content: "<font color='red'>Admin Only Option.</font> <br> Input user name and hit set to remove given user.",
+                placement: "bottom"
+        });
+
+	tour.addStep({
+                element: "#averageGoalButton",
+                title: "Average Goal Time Per Ping",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + avgGoalTitle + " <br> A Minimum of 5000ms is recommended.",
+                placement: "bottom"
+        });
+	
+	tour.addStep({
+                element: "#startingThreadsButton",
+                title: "Starting Threads",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + startingThreadsTitle + " <br> The higher this value, the larger the memory requirements of the backend when initially ran.",
+                placement: "right"
+        });
+	
+	tour.addStep({
+                element: "#maxThreadsButton",
+                title: "The maximum amount of threads the backend can run at a single time.",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + maxThreadsTitle + " <br> A Minimum of 10 and a maximum of 75 threads is recommended.",
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#tRemovalButton",
+                title: "Thread Removal Co-efficient",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + tRemovalTitle,
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#tAddButton",
+                title: "Thread Adding Co-efficient",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + tAddTitle,
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#runsPerThreadButton",
+                title: "Runs / Thread",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + runsPerThreadTitle + " <br> A value of 5 seems normal.",
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#pingsDBButton",
+                title: "Pings / DB Call",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + pingsDBTitle + " <br> A higher value means the DB gets written to less, and will be under less stress. However the time between updates on the front end will suffer accordingly.",
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#minuteAgeButton",
+                title: "Minute Graph Aging",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + minuteAgeTitle + " <br> 9,000,000 ms is default.",
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#hourAgeButton",
+                title: "Hour Graph Aging",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + hourAgeTitle + " <br> 14,400,000 is default.",
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#dayAgeButton",
+                title: "Day Graph Aging",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + dayAgeTitle + " <br> 345,600,000 is default.",
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#weekAgeButton",
+                title: "Week Graph Aging",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + weekAgeTitle + " <br> 2,419,200,000 is default.",
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#pingMinuteButton",
+                title: "Time Averaged in Hour Table",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + pingMinuteTitle + " <br> 300,000 is default.",
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#pingHourButton",
+                title: "Time Averaged in Day Table",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + pingHourTitle + " <br> 3,600,000 is default.",
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#pingDayButton",
+                title: "Time Averaged in Week Table",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + pingDayTitle + " <br>  86,400,000 is default.",
+                placement: "right"
+        });
+	
+        tour.addStep({
+                element: "#pingWeekButton",
+                title: "Time Averaged in Year Table",
+                content: "<font color='red'>Admin Only Option.</font> <br> " + pingWeekTitle + " <br> 604,800,000 is default.",
+                placement: "right"
+        });
+}
+
+//Last Step of tour, used if user is an admin, or not
+tour.addStep({
+                element: "#logoutButton",
+                title: "Logout Here",
+                content: "Logout to keep those dirty good for nothings away from your precious hostmon.",
+                placement: "top"
+        });
+
+
+
+// Initialize the tour
+tour.init();
+
+// Start the tour
+tour.start();
+
 });			 
 
 // Query the server and redraw a specific graphs data. 

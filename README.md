@@ -4,6 +4,33 @@ HostMon
 
 Hostmon is a multi-user latency &amp; uptime analytical tool.
 
+Manual Install Instructions
+-Dependencies
+--Web Server
+---PHP
+
+--DB Server
+---MySQL
+
+--Backend Server
+---Java 6-8
+
+-Backend
+--needs java to run, or jdk to compile.
+--needs mysql-connector in the classpath
+--When compileing add to the classpath javac -cp .:mysql*.jar HelloWorld.java
+*.
+--Then run with javaa -cp .:mysql*.jar
+.*
+
+-MySQL
+--create database ;
+--import db from .sql dump ;
+--create user ;
+--give user permissions on db ;
+--edit db.cfg with known parameters ; 
+
+
 Version 0.5
 -Added backend online display dot to grid.php
 -Added ability of admin to stop or start the backend via the front end.

@@ -196,139 +196,139 @@ function Menu(){
 					<h5 class="removeUserErrorOutput" title="Shows the user an error message if change password is bad.">
 					-</h5>
 				
-					<h4 style="right:112px;"
+					<h4 style="right:112px;" id="avgGoalTitle"
 						title="The time, in milliseconds, that we are aiming to have each record updated in. This will have an effect on the number of threads running in backend."
 					>Avg. Goal Time (ms) </h4>
 					<input type="text" class="averageGoalTime" style="display:inline; width:42px;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'averageGoalTime\')">SET</button><br>
+					<button id="avgGoalButton" onClick="setConfigValue(\'averageGoalTime\')">SET</button><br>
 					
-					<h4 title="The number of threads the backend starts with. The thread number will change as the backend runs."
+					<h4 title="The number of threads the backend starts with. The thread number will change as the backend runs." id="startingThreadsTitle"
 					>Starting Threads (ms)</h4>
 					<input type="text" class="startingThreads" style="display:inline;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'startingThreads\');">SET</button><br>
+					<button id="startingThreadsButton" onClick="setConfigValue(\'startingThreads\');">SET</button><br>
 					
-					<h4 title="The maximum number of threads the backend will be able to run."
+					<h4 title="The maximum number of threads the backend will be able to run." id="maxThreadsTitle" 
 					>Max Threads </h4>
 					<input type="text" class="maxThreads" style="display:inline;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'maxThreads\');">SET</button><br>
+					<button id="maxThreadsButton" onClick="setConfigValue(\'maxThreads\');">SET</button><br>
 					
-					<h4 title="The Value that decides when threads are removed. The Lower the value the sooner an unneeded thread is removed."
+					<h4 title="The Value that decides when threads are removed. The Lower the value the sooner an unneeded thread is removed." id="tRemovalTitle" 
 					>T. Removal Co-eff.</h4>
 					<input type="text" class="threadRemovalCoefficient" style="display:inline;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'threadRemovalCoefficient\');">SET</button><br>
+					<button id="tRemovalButton" onClick="setConfigValue(\'threadRemovalCoefficient\');">SET</button><br>
 					
-					<h4 title="The Value that decides when threads are added. The Higher the value the sooner a needed thread is added."
+					<h4 title="The Value that decides when threads are added. The Higher the value the sooner a needed thread is added." id="tAddTitle" 
 					>T. Add Co-Eff.</h4>
 					<input type="text" class="threadAddCoefficient" style="display:inline;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'threadAddCoefficient\');">SET</button><br>
+					<button id="tAddButton" onClick="setConfigValue(\'threadAddCoefficient\');">SET</button><br>
 					
-					<h4 title="Every x amount of times a thread is run we check if we need to add or remove a thread."
+					<h4 title="Every x amount of times a thread is run we check if we need to add or remove a thread." id="runsPerThreadTitle"
 					>Run / Thread Check</h4>
 					<input type="text" class="runPerThreadCheck" style="display:inline;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'runPerThreadCheck\');">SET</button><br>
+					<button id="runsPerThreadButton" Click="setConfigValue(\'runPerThreadCheck\');">SET</button><br>
 					
-					<h4 title="The number of times we will ping before we make a call to the database."
+					<h4 title="The number of times we will ping before we make a call to the database." id="pingsDBTitle" 
 					># Pings B4 DB</h4>
 					<input type="text" class="numPingRunsBeforeDBRecord" style="display:inline;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'numPingRunsBeforeDBRecord\');">SET</button><br>
+					<button id="pingsDBButton" onClick="setConfigValue(\'numPingRunsBeforeDBRecord\');">SET</button><br>
 					
 					<h4 style="right:112px;"
-						title="The age each record in the minute table should get before being deleted. In Milliseconds."
+						title="The age each record in the minute table should get before being deleted. In Milliseconds." id="minuteAgeTitle" 
 					>Minute Age Limit </h4>
 					<input type="text" class="minuteRecordAgeLimit" style="display:inline; width:50px;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'minuteRecordAgeLimit\');">SET</button><br>
+					<button id="minuteAgeButton" onClick="setConfigValue(\'minuteRecordAgeLimit\');">SET</button><br>
 					
 					<h4 style="right:132px;"
-						title="The age each record in the hour table should get before being deleted. In Milliseconds."
+						title="The age each record in the hour table should get before being deleted. In Milliseconds." id="hourAgeTitle" 
 					>Hour Age Limit</h4>
 					<input type="text" class="hourRecordAgeLimit" style="display:inline; width:70px;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'hourRecordAgeLimit\');">SET</button><br>
+					<button id="hourAgeButton" onClick="setConfigValue(\'hourRecordAgeLimit\');">SET</button><br>
 					
 					<h4 style="right:140px;"
-						title="The age each record in the day table should get before being deleted. In Milliseconds."
+						title="The age each record in the day table should get before being deleted. In Milliseconds." id="dayAgeTitle" 
 					>Day Age Limit</h4>
 					<input type="text" class="dayRecordAgeLimit" style="display:inline; width:80px;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'dayRecordAgeLimit\');">SET</button><br>
+					<button id="dayAgeButton" onClick="setConfigValue(\'dayRecordAgeLimit\');">SET</button><br>
 					
 					<h4 style="right:150px;"
-						title="The age each record in the week table should get before being deleted. In Milliseconds."
+						title="The age each record in the week table should get before being deleted. In Milliseconds." id="weekAgeTitle" 
 					>Week Age Limit</h4>
 					<input type="text" class="weekRecordAgeLimit" style="display:inline; width:90px;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'weekRecordAgeLimit\');">SET</button><br>
+					<button id="weekAgeButton" onClick="setConfigValue(\'weekRecordAgeLimit\');">SET</button><br>
 					
 					<h4 style="right:112px;"
-						title="The amount of milliseconds we want to retrieve to average out new pings to add to hour table default was 5 minutes or 300000"
+						title="The amount of milliseconds we want to retrieve to average out new pings to add to hour table default was 5 minutes or 300000" id="pingMinuteTitle" 
 					>New Ping Minutes</h4>
 					<input type="text" class="newestPingMinutes" style="display:inline; width:50px;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'newestPingMinutes\');">SET</button><br>
+					<button id="pingMinuteButton" onClick="setConfigValue(\'newestPingMinutes\');">SET</button><br>
 					
 					<h4 style="right:132px;"
-						title="The amount of milliseconds we want to retrieve in order to average out pings to add to the day table default is 1 hour or 3600000 millis"
+						title="The amount of milliseconds we want to retrieve in order to average out pings to add to the day table default is 1 hour or 3600000 millis" id="pingHourTitle" 
 					>New Ping Hours</h4>
 					<input type="text" class="newestPingHours" style="display:inline; width:70px;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'newestPingHours\');">SET</button><br>
+					<button id="pingHourButton" onClick="setConfigValue(\'newestPingHours\');">SET</button><br>
 					
 					<h4 style="right:140px;"
-						title="The amount of milliseconds we want to retrieve in order to average out pings to add to the day table default is 1 day or 86400000 millis"
+						title="The amount of milliseconds we want to retrieve in order to average out pings to add to the week table default is 1 day or 86400000 millis" id="pingDayTitle" 
 					>New Ping Days</h4>
 					<input type="text" class="newestPingDays" style="display:inline; width:80px;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'newestPingDays\');">SET</button><br>
+					<button id="pingDayButton" onClick="setConfigValue(\'newestPingDays\');">SET</button><br>
 					
 					<h4 style="right:150px;"
-						title="The amount of milliseconds we want to retrieve in order to average out pings to add to the day table default is 1 week or 604800000 millis"
+						title="The amount of milliseconds we want to retrieve in order to average out pings to add to the year default is 1 week or 604800000 millis" id="pingWeekTitle" 
 					>New Ping Weeks</h4>
 					<input type="text" class="newestPingWeeks" style="display:inline; width:90px;"
 							onClick="setMenuInputFocusIn(this);"
 							onfocus="setMenuInputFocusIn(this);" onblur="setMenuInputFocusOut(this);"
 							infocusin="setMenuInputFocusIn(this);" onfocusout="setMenuInputFocusOut(this);">
-					<button onClick="setConfigValue(\'newestPingWeeks\');">SET</button><br>
+					<button id="pingWeekButton" onClick="setConfigValue(\'newestPingWeeks\');">SET</button><br>
 				';
 	}
 	$menu = $menu .'
 			</li>
-        		<li style="height: 10%;"><a href="login.php?logout=true">Logout</a></li>
+        		<li id="logoutButton" style="height: 10%;"><a href="login.php?logout=true">Logout</a></li>
 			</ul>
 		</nav>';
 	return $menu;

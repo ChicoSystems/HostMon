@@ -78,6 +78,15 @@ if(isset($_GET['logout'])){ // User is logging out.
 <script type="text/javascript">
 /** Event called when document is loaded. */
 $(document).ready(function() {
+
+	//If user presses enter, we want to click submit button
+	$('#password').keypress(function(e){
+		if(e.which == 13){
+			jQuery('#submit').focus().click();
+		}
+	});
+	
+
 	// Register an event listener on the submit id. 
 	$("#submit").click(function(){
 		var buttontext = $("#submit").val();
