@@ -31,6 +31,10 @@ Manual Install Instructions
 --edit db.cfg with known parameters ; 
 
 
+Version 0.6 (7/7/16)
+-Added tour system for new users.
+-Fixed login bug. Enter button now works.
+
 Version 0.5
 -Added backend online display dot to grid.php
 -Added ability of admin to stop or start the backend via the front end.
