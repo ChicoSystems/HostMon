@@ -57,3 +57,19 @@ Version 0.2
 
 Version 0.1
 -Added ability to add new device. Not done yet.
+
+
+
+ToDo:
+DONE - Add ability to upload sounds for alarm system in the menu.
+DONE - Make a volume controller for sounds in the menu, Controlling each sound individually and letting us play
+       the sound so we can hear how loud it is.
+Change limits that decide when the colors change updateGridColor() in grid.php
+DONE - Suddenly the hour and day graphs aren't showing anymore.
+Restyle the menu to fit in better with the theme.
+Put Add device dialog in menu
+Remove the Plus Add device square,
+Update the tour to do the add device part when we are in the menu.
+Remove shrink arrow when grid is smallest.
+Remove grow arrow when grid is largest.
+During Install need to check for 777 permissions for alarms/

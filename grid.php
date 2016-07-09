@@ -14,6 +14,8 @@ include_once("php/db.php");
 $userName = "Guest";
 $adminLevel;
 $loggedIn = false;
+$yellowAlarm = getAlarm('yellow');
+$redAlarm = getAlarm('red');
 if(!isset($_SESSION)) session_start();
 
 //this is really a bad idea to check if we are logged in with a get variable, 
@@ -46,12 +48,13 @@ $gridPositions = getGridPositions(count($devices)); // returns a 2d array with i
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
 		<link href="css/bootstrap-tour-standalone.css" rel="stylesheet">
                 <link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
+		<link href="css/uploadfile.css" rel="stylesheet">
 		<a class="menu" href="#" id="tour-menu">
 			<div class="bar"></div>
 			<div class="bar"></div>
 			<div class="bar"></div>
 		</a>
-		<div id="onlineDot" class="dotUnknown"></div>
+		<div id="onlineDot" class="dotUnknown playPager"></div>
 		<?php echo Menu();?>
 		<!-- This is the entire page, where the grid can roam. -->
 		<section class="grid">
@@ -124,6 +127,7 @@ $gridPositions = getGridPositions(count($devices)); // returns a 2d array with i
 <script src="js/hostmonChart.js"></script>
 <script type="text/javascript" src="js/jquery.gridster.min.js" charster="utf-8"></script>
 <script src="js/bootstrap-tour-standalone.min.js"></script>
+<script src="js/uploadfile.min.js"></script>
 
 <script type="text/javascript">
 var gridster = 0;
@@ -132,7 +136,11 @@ var gridGraphTimeOut; //Used to disable ajax updating of the page when device.ph
 var tour; //used to construct tours
 var overlay; //Overlay used to display device.
 var adminLevel = <?php echo $adminLevel; ?>;
-	
+var redAudioElement; //used to play alarms with audioElement.play();
+var yellowAudioElement; //used to play alarms with audioElement.play();
+var yellowAlarm = "<?php echo $yellowAlarm; ?>";
+var redAlarm = "<?php echo $redAlarm; ?>";
+
 //Initialize Gridster
 gridster = $("#frontGrid > ul").gridster({
 	widget_margins: [5, 5],
@@ -350,11 +358,11 @@ overlay = $("li[rel]").overlay({
 				}
 			}
 		}).data('gridster');
-		tour.next();	
+		if(!tour.ended())tour.next();	
 	},// End onClose.
 	onLoad: function() {
 //	tour.redraw();
-		if(true) tour.next();
+		if(!tour.ended()) tour.next();
 	},
 	api: true
 }); // End overlay Event.
@@ -385,6 +393,99 @@ $(document).ready(function() {
 	setTimeout('updateGridGraphs()',10);
 	//alert("about to set menu config info");
 	setMenuConfigInfo(true); //we don't want it to start repeating
+
+	/*setup alarms*/
+	/*
+	redAudioElement = document.createElement('audio');
+        redAudioElement.setAttribute('src', 'alarms/firePager.mp3');
+        redAudioElement.setAttribute('preload', 'preload');
+	redAudioElement.setAttribute('id', 'redAudioElement');
+
+	yellowAudioElement = document.createElement('audio');
+	yellowAudioElement.setAttribute('src', 'alarms/bleep.mp3');
+	yellowAudioElement.setAttribute('preload', 'preload');
+	yellowAudioElement.setAttribute('id', 'yellowAudioElement');
+
+        $.get();
+
+        redAudioElement.addEventListener("load", function() {
+        }, true);
+
+        $('.playPager').click(function() {
+            redAudioElement.play();
+        });
+
+        $('.pausePager').click(function() {
+            redAudioElement.pause();
+        });
+
+	yellowAudioElement.addEventListener("load", function() {
+        }, true);
+
+        $('.playBleep').click(function() {
+            yellowAudioElement.play();
+        });
+
+        $('.pauseBleep').click(function() {
+            yellowAudioElement.pause();
+        });
+*/
+/*
+$("#yellowuploader").uploadFile({
+	url:"php/uploadFile.php",
+	acceptFiles: "audio/*",
+	fileName:"myfile",
+	onLoad:function(obj){
+	},
+	onSubmit:function(files){
+		if (files.toString().toLowerCase().indexOf("mp3") >= 0){
+		}else{
+			$("#eventsmessage").html($("#eventsmessage").html()+"<br/>Error, wrong file format. .mp3 ONLY!");
+			return false;
+		}
+	},
+	onSuccess:function(files,data,xhr,pd){
+		$("#eventsmessage").html($("#eventsmessage").html()+"<br/>Success for: "+JSON.stringify(data));
+	},
+	afterUploadAll:function(obj){
+		$("#eventsmessage").html($("#eventsmessage").html()+"<br/>All files are uploaded");
+	},
+	onError: function(files,status,errMsg,pd){
+		$("#eventsmessage").html($("#eventsmessage").html()+"<br/>Error for: "+JSON.stringify(errMsg));
+	},
+	onCancel:function(files,pd){
+		$("#eventsmessage").html($("#eventsmessage").html()+"<br/>Canceled  files: "+JSON.stringify(files));
+	}
+});
+
+$("#reduploader").uploadFile({
+        url:"php/uploadFile.php",
+        acceptFiles: "audio/*",
+        fileName:"myfile",
+        onLoad:function(obj){
+        },
+        onSubmit:function(files){
+                if (files.toString().toLowerCase().indexOf("mp3") >= 0){
+                }else{
+                        $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Error, wrong file format. .mp3 ONLY!");
+                        return false;
+                }
+        },
+        onSuccess:function(files,data,xhr,pd){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Success for: "+JSON.stringify(data));
+        },
+        afterUploadAll:function(obj){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>All files are uploaded");
+        },
+        onError: function(files,status,errMsg,pd){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Error for: "+JSON.stringify(errMsg));
+        },
+        onCancel:function(files,pd){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Canceled  files: "+JSON.stringify(files));
+        }
+});
+
+*/
 
 tour = new Tour({
  debug: true,
@@ -868,18 +969,29 @@ function updateMSDisplay(canvas, newPing){
 /** Updates the grid's color based on the latest data received. */
 function updateGridColor(canvas, newPing){
 	var blueLimit = 700; // The limit below which the widget will display blue. We will later retrieve these values from a db.
+	var grandParent = $(canvas).parent().parent();
 	var yellowLimit = 2000; // The limit below which the widget will display yellow. Above this it will display red.
 	var newClass; // The color we are adding to the widgets class.
 	if(newPing == 0 || newPing > yellowLimit){
 		newClass = 'red';
+		//Play Audio Alarm, only when a change happens. If we already had red class then don't play it.
+		if(! $(grandParent).hasClass("red")){
+
+			redAudioElement.play();
+		}
 	}else if(newPing < blueLimit){
 		newClass = '';
 	}else if(newPing <= yellowLimit){
 		newClass = 'yellow';
+		//Play Audio Alarm, only when a change happens. If we already had yellow class then don't play it.
+		if(! $(grandParent).hasClass("yellow")){
+
+                        yellowAudioElement.play();
+                }
+
 	}
 	
 	//Find the widget this canvas is in, and add the correct class to it, turning it the correct color.
-	var grandParent = $(canvas).parent().parent();
 	$(grandParent).removeClass("red");
 	$(grandParent).removeClass("yellow");
 	$(grandParent).addClass(newClass);

@@ -122,7 +122,9 @@ function buildScripts($ip, $deviceID, $notes){
 	
 	//keeps track of the line chart that is currently updating.	  
 	function setLineChart(name){
-                if(name == 'HourLine' || name == 'DayLine') tour.next();
+                if(name == 'HourLine' || name == 'DayLine'){
+			if(!tour.ended()) tour.next();
+		}
 		currentLineChart = name; 
 		quickUpdateGraph(); 
 	}

@@ -127,7 +127,42 @@ function Menu(){
 			';
 	
 	
-	$menu = $menu.'<h4 style="right:150px;"
+	$menu = $menu.'
+		<h4 style="right:150px;" title="Volume Section" id="volumeSection">
+			Red Alarm
+		</h4><br>
+		<section id="volumeSection">
+			<span class="redtooltip"></span>
+			<div id="redslider"></div>
+
+			<span class="redvolume">
+			<svg height="12" width="12" id="redMute">
+  				<circle cx="6" cy="6" r="5" stroke="red" stroke-width="2" fill="none" />
+				<line x1="2" y1="2" x2="10" y2="10" style="stroke:rgb(255,0,0);stroke-width:2" />
+			</svg></span>
+		</section><br>
+		<div id="reduploader">Upload</div>
+		
+		<h4 style="right:150px;" title="Volume Section" id="volumeSection">
+                        Yellow Alarm
+                </h4><br>
+	
+		<section id="volumeSection">
+			<span class="yellowtooltip"></span>
+			<div id="yellowslider"></div>
+			<span class="yellowvolume">
+			 <svg height="12" width="12" id="yellowMute">
+                                <circle cx="6" cy="6" r="5" stroke="red" stroke-width="2" fill="none" />
+                                <line x1="2" y1="2" x2="10" y2="10" style="stroke:rgb(255,0,0);stroke-width:2" />
+                        </svg>
+			</span>
+		</section><br>	
+		<div id="yellowuploader">Upload</div>
+                        <div id="eventsmessage"></div>
+			<br>
+		
+
+			<h4 style="right:150px;"
 						title="Set a new password for your account."
 					>Change Password</h4>
 					<input text="NEW PASS" type="password" class="changePassword1" style="display:inline; width:90px;"
@@ -455,6 +490,44 @@ function buildNotesGrid($notes){
 	$noteClosing = buildNotesClosing();
 	$returnVal = $notesOpening.$noteItems.$noteClosing;
 	return $returnVal;
+}
+
+/** Returns a String with the name of the yellow alarm. */
+function getAlarm($type){
+	if($type == 'yellow'){
+		$id=19;
+	}else if($type == 'red'){
+		 $id=20;
+	}
+	$con = openDB();
+	mysqli_select_db($con,"hostmon");
+	$sql="SELECT value FROM `configuration` WHERE id = '".$id."'";
+	$result = mysqli_query($con,$sql);
+	$returnArray = Array();
+	while($row = mysqli_fetch_array($result)) {
+		array_push($returnArray, $row);
+	}
+	//echo $type." Alarm is: ".$returnArray[0][0];	
+	return $returnArray[0][0];
+}
+
+/** Sets the name of the alarm to be used in the database .*/
+function setAlarm($type, $name){
+	if($type == 'yellow'){
+		$id = 19;
+	}else if($type == 'red'){
+		$id = 20;
+	}
+	$con = openDB();
+	mysqli_select_db($con,"hostmon");
+	$sql="update configuration SET value='".$name."' WHERE id=".$id.";";
+	$result = mysqli_query($con,$sql);
+	$returnArray = Array();
+	while($row = mysqli_fetch_array($result)) {
+		array_push($returnArray, $row);
+	}
+	
+	echo $type." Alarm is: ".print_r($returnArray);	
 }
 
 /** Returns an Array of notes from the DB, based on deviceID. */

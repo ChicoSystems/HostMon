@@ -5,6 +5,10 @@ var menuTimeout; // Will control if we are updating menu or not.
 var getBackendRunningTimeout;
 var focusedMenuItemName = 'none';
 var buttonLocked;
+var redMuted = false;
+var redslider;
+var yellowMuted = false;
+var slider;
 
 //Event Handler called when document is first loaded.
 $(document).ready(function() {
@@ -17,7 +21,7 @@ $(document).ready(function() {
 		$('body').addClass('menu-open');
 		
 		//If tour is running, have it advance when menu is open.
-		tour.next();
+		if(!tour.ended())tour.next();
 		return false;
 	});
 
@@ -27,6 +31,8 @@ $(document).ready(function() {
 		clearTimeout(menuTimeout); // Remove the timer.
 		$('body').removeClass('menu-open');
 		$('nav').removeClass('open');
+		$(".ajax-file-upload-container").fadeOut(); //cause upload messages to disappear
+		$("#eventsmessage").fadeOut(); //cause upload messages to disappear
 	});
 	
 	//We need to check the class of id stopStartButton. and set the buttons text
@@ -37,6 +43,211 @@ $(document).ready(function() {
 	$("#stopStartButton").text(newButtonText);
 	$("#stopStartLabel").text(newButtonText + " Backend");
 	$(".startBackendErrorOutput").text(newErrorText);
+
+
+	 /*setup alarms*/
+        redAudioElement = document.createElement('audio');
+        redAudioElement.setAttribute('src', 'alarms/'+redAlarm);
+        redAudioElement.setAttribute('preload', 'preload');
+        redAudioElement.setAttribute('id', 'redAudioElement');
+
+        yellowAudioElement = document.createElement('audio');
+        yellowAudioElement.setAttribute('src', 'alarms/'+yellowAlarm);
+        yellowAudioElement.setAttribute('preload', 'preload');
+        yellowAudioElement.setAttribute('id', 'yellowAudioElement');
+
+        $.get();
+
+        redAudioElement.addEventListener("load", function() {
+        }, true);
+
+        $('.playPager').click(function() {
+            redAudioElement.play();
+        });
+
+        $('.pausePager').click(function() {
+            redAudioElement.pause();
+        });
+
+        yellowAudioElement.addEventListener("load", function() {
+        }, true);
+
+        $('.playBleep').click(function() {
+            yellowAudioElement.play();
+        });
+
+        $('.pauseBleep').click(function() {
+            yellowAudioElement.pause();
+        });
+
+	//When the volume icon is clicked it toggles that alarms mute
+	$(".redvolume").click(function() {
+		if(redMuted){
+			console.log("unmute red Volume");
+			redMuted = false;
+			redAudioElement.volume = (redslider.slider('value') / 100);
+			$("#redMute").hide();	
+		}else{
+			console.log("mute red volume");
+			redMuted = true;
+			redAudioElement.volume = 0;	
+			$("#redMute").show();
+		}		
+
+	});
+
+	 $(".yellowvolume").click(function() {
+                if(yellowMuted){
+                        console.log("unmute yellow Volume");
+                        yellowMuted = false;
+                        yellowAudioElement.volume = (slider.slider('value') / 100);
+                        $("#yellowMute").hide();
+                }else{
+                        console.log("mute yellow volume");
+                        yellowMuted = true;
+                        yellowAudioElement.volume = 0;
+                        $("#yellowMute").show();
+                }
+
+        });
+
+
+	
+$("#yellowuploader").uploadFile({
+        url:"php/uploadFile.php",
+        acceptFiles: "audio/*",
+        fileName:"myfile",
+	formData: {alarmType: "yellow"},
+        onLoad:function(obj){
+        },
+        onSubmit:function(files){
+                if (files.toString().toLowerCase().indexOf("mp3") >= 0){
+                }else{
+                        $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Error, wrong file format. .mp3 ONLY!");
+                        return false;
+                }
+        },
+        onSuccess:function(files,data,xhr,pd){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Success for: "+JSON.stringify(data));
+		yellowAlarm = files.toString();
+        	yellowAudioElement.setAttribute('src', 'alarms/'+yellowAlarm);
+        },
+        afterUploadAll:function(obj){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>All files are uploaded");
+        },
+        onError: function(files,status,errMsg,pd){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Error for: "+JSON.stringify(errMsg));
+        },
+        onCancel:function(files,pd){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Canceled  files: "+JSON.stringify(files));
+        }
+});
+
+
+$("#reduploader").uploadFile({
+        url:"php/uploadFile.php",
+        acceptFiles: "audio/*",
+        fileName:"myfile",
+	formData: {alarmType: "red"},
+        onLoad:function(obj){
+        },
+        onSubmit:function(files){
+                if (files.toString().toLowerCase().indexOf("mp3") >= 0){
+                }else{
+                        $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Error, wrong file format. .mp3 ONLY!");
+                        return false;
+                }
+        },
+        onSuccess:function(files,data,xhr,pd){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Success for: "+JSON.stringify(data));
+        	redAlarm = files.toString();
+		redAudioElement.setAttribute('src', 'alarms/'+redAlarm);
+	},
+        afterUploadAll:function(obj){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>All files are uploaded");
+        },
+        onError: function(files,status,errMsg,pd){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Error for: "+JSON.stringify(errMsg));
+        },
+        onCancel:function(files,pd){
+                $("#eventsmessage").html($("#eventsmessage").html()+"<br/>Canceled  files: "+JSON.stringify(files));
+        }
+});
+
+
+	//Setup the volume control functions
+	$(function() {
+
+		redslider = $('#redslider'),
+                redtooltip = $('.redtooltip');
+                redtooltip.hide();
+                redslider.slider({
+                        range: "min",
+                        min: 0,
+                        max: 100,
+                        step: 1,
+                        value: 35,
+                        start: function(event,ui) {
+                                redtooltip.fadeIn('fast');
+                        },
+                        slide: function(event, ui) {
+                                var value = redslider.slider('value'),
+                                redvolume = $('.redvolume');
+                                redtooltip.css('left', value).text(ui.value);
+                                if(value <= 5) {
+                                        redvolume.css('background-position', '0 0');
+                                }else if (value <= 25) {
+                                        redvolume.css('background-position', '0 -25px');
+                                }else if (value <= 75) {
+                                        redvolume.css('background-position', '0 -50px');
+                                }else{
+                                       redvolume.css('background-position', '0 -75px');
+                                };
+                        },
+
+                        stop: function(event,ui) {
+                                redtooltip.fadeOut('fast');
+                                redAudioElement.volume = (redslider.slider('value') / 100);
+                                console.log("Red Alarm Volume: " + redslider.slider('value'));
+                        },
+                });
+
+
+		slider = $('#yellowslider'),
+		yellowtooltip = $('.yellowtooltip');
+		yellowtooltip.hide();
+		slider.slider({
+			range: "min",
+			min: 0,
+			max: 100,
+			step: 1,
+			value: 35,
+			start: function(event,ui) {
+				yellowtooltip.fadeIn('fast');
+			},
+ 			slide: function(event, ui) {
+				var value = slider.slider('value'),
+				volume = $('.yellowvolume');
+				yellowtooltip.css('left', value).text(ui.value);
+				if(value <= 5) { 
+					volume.css('background-position', '0 0');
+				}else if (value <= 25) {
+					volume.css('background-position', '0 -25px');
+				}else if (value <= 75) {
+					volume.css('background-position', '0 -50px');
+				}else{
+					volume.css('background-position', '0 -75px');
+				};
+			},
+ 
+			stop: function(event,ui) {
+				yellowtooltip.fadeOut('fast');
+				yellowAudioElement.volume = (slider.slider('value') / 100);
+				console.log("Yellow Alarm Volume: " + slider.slider('value'));	
+			},
+		});
+ 
+	});
 });	
 
 /** Ajax call used to put the current backend status, "backendRunning" or "backendStopped
