@@ -17,6 +17,7 @@ body {
 	width: 10px;
 	height: 10px;
 	border-radius:5px;
+	right:20px;
 }
 
 .dotUnknown{
@@ -94,6 +95,7 @@ body {
 	 position:absolute;
 	 top:-15px;
 	margin-top: -10px;
+	right: 50px;
  }
 
  .main-body .version{
@@ -260,7 +262,7 @@ nav ul {
 nav ul > li {
 	
 	display: table;
-	text-align: center;
+	text-align: right;
 	float: left;
 	-webkit-transition: all 0.4s;
 	-moz-transition: all 0.4s;
@@ -282,6 +284,7 @@ nav ul > li h5{
 	color: red;
 	margin-top:1px;
 	margin-bottom:1px;
+	text-align: center;
 }
 
 nav ul > li input{
@@ -289,27 +292,32 @@ nav ul > li input{
 	font-family: Raavi;
 	border: none;
 	width:20px;
-	height:17px;
+	height:25px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	position:fixed;
-	right:50px;
+	right:60px;
+	font-size:15px;
+	text-align:center;
 }
 
 nav ul > li button{
 	
-	height:20px;
+	height:25px;
 	display:inline;
 	font-family: Raavi;
-	color: black;
+	font-size:20px;
+	color: white;
+	background: #51bbff;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
+	border-style:none;
 	position:fixed;
-	right:3px;
+	right:5px;
 }
 
 nav ul > li:nth-child(1) {
-	background-color: #141517;
+	background-color: #009cff;
 }
 
 nav ul > li:nth-child(2) {
@@ -343,11 +351,12 @@ nav ul > li:nth-child(5) {
 nav ul > li > a {
 	text-decoration: none;
 	color: white;
+	text-align:center;
 	font-family: Raavi;
 	text-transform: uppercase;
 	display: table-cell;
 	vertical-align: middle;
-	font-size: 16px;
+	font-size: 30px;
 	letter-spacing: 0.05em;
 	-webkit-transition: all 0.2s linear;
 	-moz-transition: all 0.2s linear;
@@ -360,12 +369,12 @@ nav ul > li > a:hover {
 }
 
 nav.left, nav.right {
-    width: 280px;
+    width: 380px;
     height: 100%;
 }
 
 nav.left ul > li, nav.right ul > li {
-	width: 100%;
+	width: 99%;
 	height: 20.2%;
 }
 
@@ -1107,7 +1116,6 @@ div.apple_overlay.black {
 
 #volumeSection{
 	position: relative;
-	left: 90px;
 }
 
 #redslider{
@@ -1115,7 +1123,7 @@ div.apple_overlay.black {
     border-style: solid;
     border-color: #333 #333 #777 #333;
     border-radius: 25px;
-    width: 100px;
+    width: 280px;
     position: absolute;
     height: 13px;
     background-color: #8e8d8d;
@@ -1136,7 +1144,8 @@ div.apple_overlay.black {
     font: 10pt Tahoma, Arial, sans-serif ;
     border-radius: 3px;
     border: 1px solid #333;
-  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, .3);
+    border-color:white;
+    box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, .3);
     box-sizing: border-box;
     background: linear-gradient(top, rgba(69,72,77,0.5) 0%,rgba(0,0,0,0.5) 100%);
 }
@@ -1147,7 +1156,7 @@ div.apple_overlay.black {
     height: 25px;
     /*right: -5px;*/
     background: url('../images/volume.png') no-repeat 0 -50px;
-    position: absolute;
+    position: relative;
     margin-top: -5px;
 }
 
@@ -1156,7 +1165,7 @@ div.apple_overlay.black {
     border-style: solid;
     border-color: #333 #333 #777 #333;
     border-radius: 25px;
-    width: 100px;
+    width: 280px;
     position: absolute;
     height: 13px;
     background-color: #8e8d8d;
@@ -1177,7 +1186,8 @@ div.apple_overlay.black {
     font: 10pt Tahoma, Arial, sans-serif ;
     border-radius: 3px;
     border: 1px solid #333;
-  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, .3);
+    border-color:white;
+    box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, .3);
     box-sizing: border-box;
     background: linear-gradient(top, rgba(69,72,77,0.5) 0%,rgba(0,0,0,0.5) 100%);
 }
@@ -1188,7 +1198,7 @@ div.apple_overlay.black {
     height: 25px;
     /*right: -5px;*/
     background: url('../images/volume.png') no-repeat 0 -50px;
-    position: absolute;
+    position: relative;
     margin-top: -5px;
 }
 
@@ -1240,4 +1250,95 @@ div.apple_overlay.black {
 	margin-top: 7px;
 	margin-right: 5px;
 	display: none;
+}
+
+/* Background of the menu. */
+.config_list{
+	border-style: solid;
+	border-color: white !important;
+	border-top: 0px;
+	border-left: 0px;
+	
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+
+}
+
+
+/* Style the buttons that are used to open and close the accordion panel */
+button.accordion {
+    background-color: #51bbff;
+    color: #fff;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    text-align: center;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+    margin-top: 3px;
+    font-family: Raavi;
+    line-height: 10px;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+button.accordion.active, button.accordion:hover {
+    background-color: #19a6d4;
+}
+
+button.accordion:after {
+    content: '\02795'; /* Unicode character for "plus" sign (+) */
+    font-size: 13px;
+    color: #009cff;
+    float: left;
+    margin-left: 5px;
+}
+
+button.accordion.active:after {
+    	color: #51bbff;
+	content: "\2796"; /* Unicode character for "minus" sign (-) */
+}
+
+/* Style the accordion panel. Note: hidden by default */
+div.panel {
+    padding: 0 18px;
+    background-color: #009cff;
+    display: none;
+}
+
+/* The "show" class is added to the accordion panel when the user clicks on one of the buttons. This will show the panel content */
+div.panel.show {
+   display: block !important;
+}
+
+#newDeviceDialog {
+	border-color: white;
+	border-style: solid;
+	border-width: 5px;
+	border-right: none;
+	border-left: none;
+}
+
+#removeButton{
+	position: absolute;
+	width:55px;
+	height: 30px;
+	background-color:inherit;
+	right: 3px;
+	top: 3px;
+	border-style:solid;
+	border-color:white;
+	border-width:2px;
+	border-radius:5px;
+	font-family: Raavi;
+	color: white;
+	text-align: center;
+	vertical-align: middle;
+	font-size:small;
+	
+}
+
+#remoteButton:hover{
+	background-color:red;
 }

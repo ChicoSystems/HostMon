@@ -89,10 +89,12 @@ function buildScripts($ip, $deviceID, $notes){
 <script src='js/Chart.min.js'></script>
 <script type='text/javascript'>
 	var gridster;
-	var dragged = 0; // Used to let us know if the grid is being dragged or not.
+	var dragged = false; // Used to let us know if the grid is being dragged or not.
 	
 	var demoData = getMinuteDemoData(); //demo data for the line chart.
 	var mainDeviceChart = getMainDeviceChart('FiveMinuteLine', '#51bbff', demoData);
+	var creatingNote = false; //used to keep multiple notes from appearing.
+
 		  
 	//setup accordion sliders
 	$(\"#accordion\").tabs(
@@ -147,13 +149,20 @@ function buildScripts($ip, $deviceID, $notes){
 	
 	//creates a note that the user can edit, this is the first step in a user creating a new note
 	function createEditableNote(){
+		/* This code keeps getting called mutliple times, for some reason...,
+		   this will stop this behaviour. */
+		if(creatingNote){	
+			return; //don't create note
+		}else{
+			creatingNote = true;
+		}
 		//alert(\"plus clicked\");
 		var divToAddTo = $('#accordion3 div:first');
 		var divToHide = $('#accordion3 div h2:first');
 		var paneToHide = $('#accordion3 div .pane');
 		var imgToHide = $('#accordion3 div img');
 		imgToHide.hide();
-		//alert(paneToHide.text());
+		//alert(createEditableNote);
 		paneToHide.css('display', 'none');
 		divToHide.toggleClass('current');
 			var toPrepend = \"<h2 class='item current'> \
@@ -166,7 +175,7 @@ function buildScripts($ip, $deviceID, $notes){
 			<div class='pane' style='display:block'><button id='noteSubmitButton' onclick='clickNoteSubmitButton();'>Submit</button><textarea id='noteInputText'></textarea></div><div style='display:none'>".$millitime."</div> \";
 		divToAddTo.prepend(toPrepend);
 		toPrepend = '';
-		tour.next();
+		if(!tour.ended())tour.next();
 	}
 	
 	//triggered when document is loaded.
@@ -186,12 +195,14 @@ function buildScripts($ip, $deviceID, $notes){
 		var time = '".$millitime."';
 		var deviceID = '".$deviceID."';
 		//alert(noteContent);
+		creatingButton = false;
 		var postData = {SubmitNote:'true',
 						noteNum:noteNum,
 						noteName:noteName,
 						noteContent:noteContent,
 						time:time,
 						deviceID:deviceID};
+		//alert(JSON.stringify(postData));
 		$.ajax({
 			type:\"POST\",
 			data : postData,
@@ -213,7 +224,7 @@ function buildScripts($ip, $deviceID, $notes){
 				//alert(\"complete\" + result);
 			},
 			error: function(xhr,status,error){
-				alert(\"error\" + error);
+				//alert(\"error\" + error);
 			}
 		});
 		tour.next();
@@ -221,11 +232,11 @@ function buildScripts($ip, $deviceID, $notes){
 		
 	//sets the dragged variable to 0 when a device is loaded.  
 	function loadDevice(id) {
-		if(!dragged){
+		//if(!dragged){
 			//alert('loadDevice ' + id);
-		}	
+	//	}	
 		// RESET DRAGGED SINCE CLICK EVENT IS FIRED AFTER drag stop
-			dragged = 0;
+	//		dragged = 0;
 	}
 	
 	//user clicks the plus sign to add new note
@@ -265,7 +276,7 @@ function buildScripts($ip, $deviceID, $notes){
 				//alert(\"complete\" + result);
 			},
 			error: function(xhr,status,error){
-				alert(\"error\" + error);
+				//alert(\"error\" + error);
 			}
 		});
 		
@@ -283,7 +294,7 @@ function buildScripts($ip, $deviceID, $notes){
 			draggable: {
 				start: function(event, ui) {
 					//Set dragged, to keep windows from opening when dragging.
-					dragged = 1;
+					dragged = true;
 				}
 			}	 
 		}).data('gridster');

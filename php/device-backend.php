@@ -106,7 +106,8 @@ if(isset($_POST['SubmitNote'])){
 	$time = $_POST['time'];
 	$noteName = $_POST['noteName'];
 	$noteContent = $_POST['noteContent'];
-	$userID = 1;
+	$userID = getUserID($noteName);
+/*
 	//mysqli_real_escape_string
 	$sanitizedContent = mysqli_real_escape_string($con, $noteContent);
 	//submit note to database
@@ -114,6 +115,10 @@ if(isset($_POST['SubmitNote'])){
 	mysqli_select_db($con,"hostmon");
 	$sql="INSERT INTO `hostmon`.`notes` (`id` ,`deviceID` ,`userID` ,`timestamp` ,`content`) VALUES (NULL , '".$deviceID."', '".$userID."', '".$time."', '".$sanitizedContent."');";
 	$result2 = mysqli_query($con,$sql);
+*/
+//	error_log("submitting note to db ".$deviceID." ".$userID." ".$time." ".$noteContent);
+	error_log("about to submitting note");
+	submitNote($deviceID, $userID, $time, $noteContent);
 	//Record the latency results to the latency list.	
     $notes = getNotes($deviceID); //db query get array of notes from device id.
 	$postResult = buildNotesGrid($notes);	

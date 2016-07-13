@@ -9,9 +9,12 @@ var redMuted = false;
 var redslider;
 var yellowMuted = false;
 var slider;
+var menuOpen = false;
 
 //Event Handler called when document is first loaded.
 $(document).ready(function() {
+	
+	
 	//Event Handler when a user clicks on the menu. Opens the menu.
 	$('.menu').click(function() {
 		setMenuConfigInfo();
@@ -19,7 +22,7 @@ $(document).ready(function() {
 		//menuTimeout = setTimeout(setMenuConfigInfo, 5000);
 		$('nav').addClass('open');
 		$('body').addClass('menu-open');
-		
+		menuOpen = true;
 		//If tour is running, have it advance when menu is open.
 		if(!tour.ended())tour.next();
 		return false;
@@ -27,12 +30,17 @@ $(document).ready(function() {
 
 	//Event Handler when a user clicks anywhere but the menu, when the menu is open. Closes the menu.
 	$(".grid").click(function() {
-		clearTimeout(getBackendRunningTimeout); // Remove the timer.
-		clearTimeout(menuTimeout); // Remove the timer.
-		$('body').removeClass('menu-open');
-		$('nav').removeClass('open');
-		$(".ajax-file-upload-container").fadeOut(); //cause upload messages to disappear
-		$("#eventsmessage").fadeOut(); //cause upload messages to disappear
+		if(menuOpen){
+			//the following code is repeated here and in grid.php
+			console.log("close menu");
+			clearTimeout(getBackendRunningTimeout); // Remove the timer.
+			clearTimeout(menuTimeout); // Remove the timer.
+			$('body').removeClass('menu-open');
+			$('nav').removeClass('open');
+			$(".ajax-file-upload-container").fadeOut(); //cause upload messages to disappear
+			$("#eventsmessage").fadeOut(); //cause upload messages to disappear
+			menuOpen = false;
+		}
 	});
 	
 	//We need to check the class of id stopStartButton. and set the buttons text
@@ -80,6 +88,12 @@ $(document).ready(function() {
             yellowAudioElement.pause();
         });
 
+	 $('.version').click(function(){
+                tour.restart();
+                yellowAudioElement.play();
+        });
+
+
 	//When the volume icon is clicked it toggles that alarms mute
 	$(".redvolume").click(function() {
 		if(redMuted){
@@ -112,6 +126,20 @@ $(document).ready(function() {
         });
 
 
+
+	/* Toggle between adding and removing the "active" and "show" classes when the user 
+ 	 * clicks on one of the "Section" buttons. The "active" class is used to add a
+ 	 * background color to the current button when its belonging panel is open. 
+ 	 * The "show" class is used to open the specific accordion panel */
+	var acc = document.getElementsByClassName("accordion");
+	var i;
+
+	for (i = 0; i < acc.length; i++) {
+	    acc[i].onclick = function(){
+	        this.classList.toggle("active");
+	        this.nextElementSibling.classList.toggle("show");
+	    }
+	}
 	
 $("#yellowuploader").uploadFile({
         url:"php/uploadFile.php",
@@ -193,7 +221,7 @@ $("#reduploader").uploadFile({
                         slide: function(event, ui) {
                                 var value = redslider.slider('value'),
                                 redvolume = $('.redvolume');
-                                redtooltip.css('left', value).text(ui.value);
+                                redtooltip.css('left', value*3).text(ui.value);
                                 if(value <= 5) {
                                         redvolume.css('background-position', '0 0');
                                 }else if (value <= 25) {
@@ -228,7 +256,7 @@ $("#reduploader").uploadFile({
  			slide: function(event, ui) {
 				var value = slider.slider('value'),
 				volume = $('.yellowvolume');
-				yellowtooltip.css('left', value).text(ui.value);
+				yellowtooltip.css('left', value*3).text(ui.value);
 				if(value <= 5) { 
 					volume.css('background-position', '0 0');
 				}else if (value <= 25) {

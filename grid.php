@@ -64,10 +64,8 @@ $gridPositions = getGridPositions(count($devices)); // returns a 2d array with i
 				<ul class='gridlist'>
 					<!-- each grid is parsed from the devices array, each grid is placed using the gridPositions array. -->
 					<?php for($i=0;$i<count($devices);$i++) : ?>
-					<li href="device.php?ip=<?php echo $devices[$i]['ip'];?>"  id="first" rel="#overlay" 
-							data-row="<?php echo $gridPositions[$i]['yp'] ?>" data-col="<?php echo $gridPositions[$i]['xp'] ?>"
-							data-sizex="<?php echo $gridPositions[$i]['xs'] ?>" data-sizey="<?php echo $gridPositions[$i]['ys'] ?>" onclick="loadDevice('0');">
-							
+					<li href="device.php?ip=<?php echo $devices[$i]['ip'];?>"  id="first" rel="#overlay" data-row="<?php echo $gridPositions[$i]['yp'] ?>" data-col="<?php echo $gridPositions[$i]['xp'] ?>" data-sizex="<?php echo $gridPositions[$i]['xs'] ?>" data-sizey="<?php echo $gridPositions[$i]['ys'] ?>" onclick="loadDevice('0');">
+			<button onClick="removeDevice('<?php echo $devices[$i]['id'];?>', '<?php echo $devices[$i]['ip']; ?>');" id="removeButton">Remove</button>				
                     	<img src="images/up-arrow.png" class="grow"><img src="images/down-arrow.png" class="shrink">
                   		<div class="device_record" >
                         	<h1><?php echo $devices[$i]['name']; ?></h1>
@@ -101,7 +99,7 @@ $gridPositions = getGridPositions(count($devices)); // returns a 2d array with i
 			</div>
 			<div class="close"></div>   
             
-           <div id="newDeviceDialog" title="Monitor New Device">
+           <div id="newDeviceDialog" title="Add New Device">
 			  <form id="newDeviceForm">
 				<fieldset>
 				  <input type="text" name="deviceName" id="deviceName" placeholder="Device Name" class="text ui-widget-content ui-corner-all">
@@ -131,7 +129,7 @@ $gridPositions = getGridPositions(count($devices)); // returns a 2d array with i
 
 <script type="text/javascript">
 var gridster = 0;
-var dragged = 0; // Used to keep the device.php overlay from loading when a grid is being dragged.
+var dragged = false; // Used to keep the device.php overlay from loading when a grid is being dragged.
 var gridGraphTimeOut; //Used to disable ajax updating of the page when device.php is overlayed.
 var tour; //used to construct tours
 var overlay; //Overlay used to display device.
@@ -140,6 +138,8 @@ var redAudioElement; //used to play alarms with audioElement.play();
 var yellowAudioElement; //used to play alarms with audioElement.play();
 var yellowAlarm = "<?php echo $yellowAlarm; ?>";
 var redAlarm = "<?php echo $redAlarm; ?>";
+var newDeviceDialog = $("#newDeviceDialog");
+var resizing = false; //Used to keep overlay from opening when pressed grow button.
 
 //Initialize Gridster
 gridster = $("#frontGrid > ul").gridster({
@@ -148,7 +148,12 @@ gridster = $("#frontGrid > ul").gridster({
 	min_cols: 8,
 	draggable: {
 		start: function(event, ui) {
-			dragged = 1; //keeps overlay from loading while we are dragging.
+			console.log("dragged");
+			dragged = true; //keeps overlay from loading while we are dragging.
+		},
+		stop: function(event, ui) {
+			console.log("stopped dragging");
+		//	dragged = false;
 		}
 	} 
 }).data('gridster');	
@@ -195,8 +200,43 @@ function getDisplay(result){
 	return display;	
 }
 
+//sends ajax call to server to remove device with $id from active_devices table
+function removeDevice(id, ip){
+	console.log("removeDevice("+id+");");
+	var postData = {
+		removeDevice:id
+	};
+
+	$.ajax({
+                type:"POST",
+                data : postData,
+                url: 'php/grid-backend.php',
+                success: function(result,status,xhr) {
+                        var message = getMessage(result);
+                        var display = getDisplay(result);
+			console.log("removeDevice success: " + message);
+                        if(message.indexOf("DeviceExists") != -1){
+                                //$(".ui-dialog-title").html("holy crap")
+                                //alert();
+                        }
+			//quick and dirty hack, reload the page
+			location.reload();			
+	
+                //      alert("message: " + message);
+                //      alert("display: " + display);
+                },
+                complete: function(result,status,xhr) {
+                        //alert("complete: " + result);
+                },
+                error: function(xhr,status,error){
+                        alert("Error in addNewDevice ajax call: " + error);
+                }
+        });
+
+}
+
 //Sends an ajax call to the server to add a new device, then it displays it.	
-function addNewDevice(newDeviceDialog){
+function addNewDevice(){
 	var deviceName = $("#deviceName").val();
 	var deviceIP = $("#deviceIP").val();
 	var deviceNote = $("#deviceNote").val();			
@@ -205,7 +245,10 @@ function addNewDevice(newDeviceDialog){
 		addNewDevice:'true',
 		deviceName:deviceName,
 		deviceIP:deviceIP,
-		deviceNote:deviceNote};
+		deviceNote:deviceNote,
+		userName:'<?php echo $userName; ?>'
+	};
+//	alert(JSON.stringify(postData));
 	$.ajax({
 		type:"POST",
 		data : postData,
@@ -219,19 +262,22 @@ function addNewDevice(newDeviceDialog){
 			}
 			var ps = getNewGridPositionAndSize(); //Finds where we are supposed to place the new grid.
 			var widget = gridster.add_widget( display, ps[0], ps[1], ps[2], ps[3]); //adds a new grid to gridster
+			//overlay.overlay(overlay.getConf());//re-register overlay listeners?
 			widget = widget.get(0);
 			var grow = $(widget).find(".grow");
-			alert("message: " + message);
-			alert("display: " + display);
+			location.reload(); //shortcut hack for adding new devices.
+		//	alert("message: " + message);
+		//	alert("display: " + display);
 		},
 		complete: function(result,status,xhr) {
 			//alert("complete: " + result);
+			 $("li[rel]").overlay(overlay.getConf());
 		},
 		error: function(xhr,status,error){
 			alert("Error in addNewDevice ajax call: " + error);
 		}
 	});
-	$( newDeviceDialog ).dialog( "close" ); //closes the add new device dialog.
+	newDeviceDialog.dialog( "close" ); //closes the add new device dialog.
 }
 		
 // Finds the last grid position, and positions a device	at the position of the newDeviceOpener
@@ -246,16 +292,21 @@ function getNewGridPositionAndSize(){
 
 // Used to be used to load the device, now it only makes sure that when a device is loaded, drag resets. 
 function loadDevice(id) {
-	if(!dragged){
+	//if(!dragged){
 		//loading the device now happens when user clicks the li[rel]
 		//this function only resets the dragged variable now.
-	}	// RESET DRAGGED SINCE CLICK EVENT IS FIRED AFTER drag stop
-	dragged = 0;
+	//}	// RESET DRAGGED SINCE CLICK EVENT IS FIRED AFTER drag stop
+	//dragged = 0;
 }
-		
+	
+	
 // Resizes a grid when the user clicks on a "grow button".
-$('.grow').on('click', function(event) {
+//$('.grow').on('click', function(event) {
+//COME BACK
+$(".gridlist").on('click', '.grow', function(event){
+	resizing = true;
 	event.stopImmediatePropagation(); // this stops the overlay from popping up.
+	//event.preventDefault(); // this stops the overlay from popping up.
 	var grid = gridster;
 	var widget = $(this).parent();
 	var xSize = widget.attr("data-sizex");
@@ -291,7 +342,7 @@ $('.grow').on('click', function(event) {
 }); // End of grow code.
 	
 // Resizes a grid widget whenever a user clicks it's "shrink button"	
-$('.shrink').on('click', function(event) {
+$('.gridlist').on('click', '.shrink', function(event) {
 	event.stopImmediatePropagation(); // Stop the device.php page from popping up when shrink button is clicked.
     var grid = gridster;
 	var widget = $(this).parent();
@@ -335,13 +386,42 @@ overlay = $("li[rel]").overlay({
 	fixed: false,
 	top: '1%',
 	onBeforeLoad: function() {
-		if(!dragged){
-			$('.menu').fadeOut(); // The menu button should fade out on the main page and appear on the second page.
+			if(dragged){
+				console.log("yes dragged");
+				dragged = false;
+				return false; //when dragging, don't popup.
+			}else{
+				console.log("no dragged");
+			}
+
+			var targ = event.target.className;
+			console.log("target: " + targ);
+			console.log("loading overlay menu Open: " + menuOpen);
+			if(menuOpen){
+				//The following code is repeaded here and in menu.js
+				console.log("close menu");
+                        	clearTimeout(getBackendRunningTimeout); // Remove the timer.
+                        	clearTimeout(menuTimeout); // Remove the timer.
+                        	$('body').removeClass('menu-open');
+                        	$('nav').removeClass('open');
+                        	$(".ajax-file-upload-container").fadeOut(); //cause upload messages to disappear
+                        	$("#eventsmessage").fadeOut(); //cause upload messages to disappear
+                        	menuOpen = false;
+				return false;
+			}
+					
+	
+			if(targ == "grow" || targ == "shrink"){
+				console.log("target was grow or shrink");
+				//return false;
+				this.getOverlay().close(); //prevent overlay from opening.
+			}
+
 			clearTimeout(gridGraphTimeOut); // disable updating of the main page, when second page is open.
 			var wrap = this.getOverlay().find(".contentWrap"); // grab wrapper element inside content
 			console.log(wrap);
 			wrap.load(this.getTrigger().attr("href")); // load the page specified in the trigger (the device clicked) to the overlay		
-		}
+		
 	},
 	onClose: function() {
 		$('.menu').fadeIn(); // Fade the menu button back in when the overlay is closed.
@@ -354,7 +434,7 @@ overlay = $("li[rel]").overlay({
 			min_cols: 8,
 			draggable: {
 				start: function(event, ui) {
-					dragged = 1;
+					dragged = true;
 				}
 			}
 		}).data('gridster');
@@ -366,9 +446,11 @@ overlay = $("li[rel]").overlay({
 	},
 	api: true
 }); // End overlay Event.
-		
+	
+//$("#newDeviceDialog").parents('div').css("border-color", "white");
+	
 // Contructs and adds a new device dialog to the screen.
-$( "#newDeviceDialog" ).dialog({
+newDeviceDialog.dialog({
 	autoOpen: false,
 	show: {
 		effect: "blind",
@@ -378,18 +460,24 @@ $( "#newDeviceDialog" ).dialog({
 		effect: "explode",
 		duration: 1000
 	},
-	buttons: [ { text: "Add Device", id: "addDeviceButton", click: function() { addNewDevice(this); } } ]
+	buttons: [ { text: "Add Device", id: "addDeviceButton", click: function() { addNewDevice(); } } ]
 }); //End of newDeviceDialog.
 
 // Handles when a user clicks on the new Device Button.
 $( "#newDeviceOpener" ).click( function(event) {
-	//alert("newDeviceOpening");
-	$( "#newDeviceDialog" ).dialog( "open" ); // Opens the new device dialog.
-	tour.next();
+	if(!dragged){
+		if(!menuOpen) //only want to open dialog if the menu is not open
+			 newDeviceDialog.dialog( "open" ); // Opens the new device dialog.
+	}else{
+		//Don't do anything, but set dragged to false.
+		dragged = false;
+	}
+	if(!tour.ended())tour.next();
 }); // End of newDeviceOpener click handler
 
 // Event Handler called when document is first loaded. Intializes the update of the grid graphs.
 $(document).ready(function() {
+	newDeviceDialog = $("#newDeviceDialog");
 	setTimeout('updateGridGraphs()',10);
 	//alert("about to set menu config info");
 	setMenuConfigInfo(true); //we don't want it to start repeating
@@ -501,7 +589,8 @@ tour = new Tour({
     content: "Click the + symbol to add a new device.",
     onShow: function(){
       //we want to close the $newDeviceDialog incaase its open from the next step of the tour
-      $("#newDeviceDialog").dialog("close");
+      //$("#newDeviceDialog").dialog("close");
+      newDeviceDialog.dialog("close");
     }
   },
   {
@@ -509,7 +598,8 @@ tour = new Tour({
     title: "Insert Device Name",
     content: "This is the name you will be referring to this device by in Hostmon.",
     onShow: function(){
-     $( "#newDeviceDialog" ).dialog( "open" ); // Opens the new device dialog.
+     //$( "#newDeviceDialog" ).dialog( "open" ); // Opens the new device dialog.
+     newDeviceDialog.dialog( "open" ); // Opens the new device dialog.
     }
   },
   {
@@ -532,7 +622,8 @@ tour = new Tour({
     title: "You first Device",
     content: "Each Device Box shows you the status of that device at a glance.",
     onShow: function(){
-      $("#newDeviceDialog").dialog("close");
+      //$("#newDeviceDialog").dialog("close");
+      newDeviceDialog.dialog("close");
     }
   },
   {
@@ -541,7 +632,8 @@ tour = new Tour({
     title: "Resizing",
     content: "Use the White arrows to resize the box. You can also drag and drop all boxes to different locations.",
     onShow: function(){
-      $("#newDeviceDialog").dialog("close");
+      //$("#newDeviceDialog").dialog("close");
+      newDeviceDialog.dialog("close");
     }
   },
   {
@@ -1050,6 +1142,7 @@ function updateGridGraphs(){
 	//update backendOnline.
 	updateBackendOnline();
 	var canvases = $("canvas");
+	console.log(canvases.length);
 	for(var i = 0; i< canvases.size(); i++){ //Loop through every canvas on the page.
 		var c = canvases.get(i);
 		var parent = c.parentElement;
