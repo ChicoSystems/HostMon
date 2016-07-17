@@ -11,6 +11,7 @@ include_once("functions.php");
 include_once("db.php");
 $postResult = "";
 $con = openDB(); //we know we are going to be querying from the db even if nothing was posted.
+$dbOptions = getDBOptions();
 	
 //decide which line graph should be displayed and pull the appropriate data from db
 if(isset($_POST['LineChart'])){
@@ -26,7 +27,7 @@ if(isset($_POST['LineChart'])){
 	}else if($_POST['LineChart']=="YearLine"){
 		$table = "year";
 	}
-	mysqli_select_db($con,"hostmon");
+	mysqli_select_db($con,$dbOptions["DB"]);
 	$sql="SELECT time, latency FROM `".$table."` WHERE ip = '".$_POST['ip']."'";
 	$result = mysqli_query($con,$sql);
 		
@@ -50,7 +51,7 @@ if(isset($_POST['PolarChart'])){
 		$table = "year";
 	}
 	$latencyList = Array(); //the structure we are reading latency results to.
-	mysqli_select_db($con,"hostmon");
+	mysqli_select_db($con,$dbOptions["DB"]);
 	$sql="SELECT latency FROM `".$table."` WHERE ip = '".$_POST['ip']."'";
 	$result2 = mysqli_query($con,$sql);
 	//Record the latency results to the latency list.
@@ -129,8 +130,8 @@ if(isset($_POST['RemoveNote'])){
 	$deviceID = $_POST['deviceID'];
 	$timestamp = $_POST['timestamp'];
 	
-	mysqli_select_db($con,"hostmon");
-	$sql="DELETE FROM `hostmon`.`notes` WHERE `notes`.`timestamp` = ".$timestamp." AND `notes`.`deviceID` = ".$deviceID.";";
+	mysqli_select_db($con,$dbOptions["DB"]);
+	$sql='DELETE FROM `.$dbOptions["DB"].`.`notes` WHERE `notes`.`timestamp` = '.$timestamp.' AND `notes`.`deviceID` = '.$deviceID.';';
 	$result2 = mysqli_query($con,$sql);
 	
 	$notes = getNotes($deviceID); //db query get array of notes from device id.

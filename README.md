@@ -85,6 +85,11 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Versioning
 
+#### Version 0.9 (7/16/16)
++ Completed Installation System
++ Bug Fix: Devices Showing Red on page load.
++ Added Java executables so Java doesn't need to be compiled by installer.
+
 #### Version 0.8 (7/12/16)
 + Updated README.md to be much more github friendly.
 + Redesigned the layout of the menu. It now fits in with the overall theme.
@@ -131,7 +136,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 * **Isaac Assegai** - [ChicoSystems](https://github.com/ChicoSystems)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/ChicoSystems/contributors) who participated in this project.
 
 ## License
 
@@ -139,6 +144,7 @@ This projects licence is forthcoming.
 
 ## Acknowledgments
 
+* Special Thanks to Micheal Earl for the original mockup of The Grid.
 * Hat tip to anyone who's code was used
 * Inspiration
 * etc
@@ -178,16 +184,6 @@ Manual Install Instructions
 --edit db.cfg with known parameters ; 
 
 ToDo:
-DONE - Add ability to upload sounds for alarm system in the menu.
-DONE - Make a volume controller for sounds in the menu, Controlling each sound individually and letting us play
-       the sound so we can hear how loud it is.
 Change limits that decide when the colors change updateGridColor() in grid.php
-DONE - Suddenly the hour and day graphs aren't showing anymore.
-DONE - Restyle the menu to fit in better with the theme.
-Put Add device dialog in menu
-Remove the Plus Add device square,
-Update the tour to do the add device part when we are in the menu.
 Remove shrink arrow when grid is smallest.
 Remove grow arrow when grid is largest.
-During Install need to check for 777 permissions for alarms/
-Setup Readme to be viewable on github.

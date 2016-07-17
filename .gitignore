@@ -1,5 +1,7 @@
-*.class
 /bin
 /cfg/java.cfg
 *.log
 /cfg/db.cfg
+*.buildpath
+*.project
+*.settings

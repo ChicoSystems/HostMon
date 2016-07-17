@@ -12,7 +12,8 @@ include_once("functions.php");
 session_start(); //We'll end up needing to check for admin status.
 if(isset($_POST['getConfigData'])){ // Front end wants ALL configuration data. Any lvl can do this.
 	$con = openDB();
-	mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con,$dbOptions['DB']);
 	$sql = "SELECT * FROM configuration";
 	$result = mysqli_query($con,$sql);
 	$config = array();
@@ -29,13 +30,14 @@ if(isset($_POST['getConfigData'])){ // Front end wants ALL configuration data. A
 }else if(isset($_POST['setConfigValue'])){
 	if($_SESSION['admin_level'] == '10'){ // Make sure user is admin before changing config values
 		$con = openDB();
-		mysqli_select_db($con,"hostmon");
+		$dbOptions = getDBOptions();
+		mysqli_select_db($con,$dbOptions['DB']);
 		$name = $_POST['name'];
 		$value = $_POST['value'];
 		$value = trim($value); // Problem with whitespace in value.
 		$sanitizedValue = mysqli_real_escape_string($con, $value); // Discourage some hackers.
 		$sanitizedValue = trim($sanitizedValue); // Get rid of leading and ending whitespace.
-		$sql = "UPDATE `hostmon`.`configuration` SET `value` = '".$sanitizedValue."' WHERE `configuration`.`name` = '".$name."';";
+		$sql = "UPDATE `".$dbOptions['DB']."`.`configuration` SET `value` = '".$sanitizedValue."' WHERE `configuration`.`name` = '".$name."';";
 		$result2 = mysqli_query($con,$sql);
 		// Pack up the name and value in a json object and send it back to the frontend.
 		$config = array();
@@ -44,12 +46,13 @@ if(isset($_POST['getConfigData'])){ // Front end wants ALL configuration data. A
 	}
 }else if(isset($_POST['changePassword'])){
 	$con = openDB();
-	mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con,$dbOptions['DB']);
 	$userName = $_SESSION['usr']; // User is only setting his own password.
 	$newPass = $_POST['newPass'];
 	$userName = mysqli_real_escape_string($con, $userName); // Discourage some hackers.
 	$newPass = mysqli_real_escape_string($con, $newPass); // Discourage some hackers.
-	$sql = "UPDATE `hostmon`.`users` SET `pass` = '".$newPass."' WHERE `users`.`usr` = '".$userName."';";
+	$sql = "UPDATE `".$dbOptions['DB']."`.`users` SET `pass` = '".$newPass."' WHERE `users`.`usr` = '".$userName."';";
 	$result2 = mysqli_query($con,$sql);
 	$config = array();
 		$config['returnVal'] = "Password Changed.";
@@ -60,7 +63,8 @@ if(isset($_POST['getConfigData'])){ // Front end wants ALL configuration data. A
 		$newAdminLvl = $_POST['newAdminLvl'];
 		
 		$con = openDB();
-		mysqli_select_db($con,"hostmon");
+		$dbOptions = getDBOptions();
+		mysqli_select_db($con,$dbOptions['DB']);
 		$config = array();
 		
 		$newUsername = mysqli_real_escape_string($con, $newUsername); // Discourage some hackers.
@@ -79,10 +83,11 @@ if(isset($_POST['getConfigData'])){ // Front end wants ALL configuration data. A
 	if($_SESSION['admin_level'] == '10'){ // Make sure user is admin before changing config values
 		$removeUsername = $_POST['removeUsername'];
 		$con = openDB();
-		mysqli_select_db($con,"hostmon");
+		$dbOptions = getDBOptions();
+		mysqli_select_db($con,$dbOptions['DB']);
 		$config = array();
 		$removeUsername = mysqli_real_escape_string($con, $removeUsername); // Discourage some hackers.
-		$sql = "DELETE FROM `hostmon`.`users` WHERE `users`.`usr` = '".$removeUsername."'";
+		$sql = "DELETE FROM `".$dbOptions['DB']."`.`users` WHERE `users`.`usr` = '".$removeUsername."'";
 		$result = mysqli_query($con,$sql);
 		$config['returnVal'] = "Removed ".$removeUsername;
 	}

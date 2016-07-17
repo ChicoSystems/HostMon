@@ -385,7 +385,7 @@ overlay = $("li[rel]").overlay({
 	effect: 'apple',
 	fixed: false,
 	top: '1%',
-	onBeforeLoad: function() {
+	onBeforeLoad: function(event) {
 			if(dragged){
 				console.log("yes dragged");
 				dragged = false;
@@ -1117,21 +1117,27 @@ function updateGridGraphData(canvas, x, y){
 						ip:currentIP,
 						timeRange:"hour"};
 		}
-		 
+		 console.log(JSON.stringify(postData));
 		 // Send the request to the server.
 		$.ajax({
 			type:"POST",
 			data : postData,
 			url: 'php/grid-backend.php', 
 			success: function(result,status,xhr) {
-				drawGridGraph(canvas, result, x, y); // We received our data, go head and draw the appropriate graph.
+				if(result == ""){//if result is empty we do not want to update gridGraphData
+
+				}else{
+					drawGridGraph(canvas, result, x, y); // We received our data, go head and draw the appropriate graph.
+				}
+				console.log("success: " + currentIP);
 			},
 			complete: function(result) {
 				// Schedule the next request when the current one's complete
 				//alert("complete" + result);
 			},
 			error: function(xhr,status,error){
-				alert("error" + error);
+				//alert("error" + error);
+				console.log("error: getGridGraphData ajax call"+ currentIP);
 			}
 		}); // End of ajax call.
 	})(canvas, x, y); //End of worker thread.

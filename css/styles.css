@@ -42,6 +42,26 @@ body {
 #installButton{
 	margin-left:148px;
 	border-radius:5px;
+	height: 45px;
+	width: 90px;
+	color: white;
+	background-color: #51bbff;
+	border-style: solid;
+	border-width: 3px;
+	font-family: Raavi;
+	font-size: 24px;
+	text-align: center;
+	vertical-align: middle;
+
+}
+
+#installButton:hover{
+	background-color:#51a1ff;
+}
+
+#installButton:active{
+	border-width:1px;
+	background-color: #5fa1ff;
 }
 
 .install_table{
@@ -71,21 +91,80 @@ body {
 }
 
 #install_red{
-	background-color: red;
+	background-color: #ff6d6f;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
+	border-color: white;
+        border-style:solid;
+        border-width: 3px;
+        font-family: Raavi;
+        font-size: 25px;
+        text-align: center;
+
+}
+
+#install_yellow{
+	background-color: #ffdb6d;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	border-color: white;
+	border-style:solid;
+	border-width: 3px;
+	font-family: Raavi;
+	font-size: 25px;
+	text-align: center;
 }
 
 #install_green{
-	background-color: green;
+	background-color: #51bbff;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
+	border-color: white;
+        border-style:solid;
+        border-width: 3px;
+        font-family: Raavi;
+        font-size: 25px;
+        text-align: center;
+
 }
 
 .install_value{
 	color:white;
 	font-family: Raavi;
 	text-align: right
+}
+
+.installError{
+	display: inline;
+	position: absolute;
+	margin-left: 1px !important;
+	margin-top: -27px;
+	
+}
+
+.hidden{
+	visibility: hidden;
+}
+
+.green{
+	background-color:#51bbff !important;
+}
+
+.installInput{
+	height: 100%;
+	border-radius: 5px;
+	background-color: #51bbff;
+	border-style: solid;
+	border-color: white;
+	border-width: 3px;
+	font-family: Raavi;
+	color:white;
+	font-size: 18px;
+	text-align: center;
+}
+
+.installInput:hover{
+	background-color: #51a1ff;
 }
  
  .gridster .version{
@@ -1341,4 +1420,41 @@ div.panel.show {
 
 #remoteButton:hover{
 	background-color:red;
+}
+
+.db_instruction{
+	color:white;
+	opacity: 1;
+	font-size: 13px;
+	position:absolute;
+	margin-top:21px;
+	text-align:center;
+	margin-left: 10px;
+}
+
+input[type=radio   ]:not(old){
+  width     : 2em;
+  margin    : 0;
+  padding   : 0;
+  font-size : 2em;
+  opacity   : 1;
+}
+
+label{
+	color:white;
+	font-family: Raavi;
+	font-size: 14px;	
+}
+
+.radioLeft{
+
+}
+
+.radioRight{
+	position:relative;
+	margin-left:150px;
+}
+
+.db_yes_admin{
+	display:none;
 }

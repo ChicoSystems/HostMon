@@ -19,7 +19,7 @@ function getCurrentVersion(){
 /** Checks if we are on linux or windows and starts the backend accordingly*/
 function startBackend(){
 	$os = getOS();
-	$javaDir = getJavaDir($os);
+	$javaDir ='';//= getJavaDir($os);
 	$backendDir = getBackendDir($os);
 echo "os is ".$os;
 	if($os == 'Win'){ // start backend on windows
@@ -33,6 +33,7 @@ echo "os is ".$os;
 	
 	
 }
+
 
 function getOS(){
 	$os = php_uname('s');
@@ -65,7 +66,8 @@ function getJavaDir(){
  */
 function stopBackend(){
 	$con = openDB();
-	mysqli_select_db($con,"HostMon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con,$dbOptions["DB"]);
 	$sql = "UPDATE `configuration` SET `configuration`.`value` = 'false' WHERE `configuration`.`name` = 'backendRunning'";
 	$result = mysqli_query($con,$sql);
 }
@@ -74,7 +76,8 @@ function stopBackend(){
 function backendRunning(){
 	$returnVal = false;
 	$con = openDB();
-	mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con,$dbOptions["DB"]);
 	$sql = "SELECT * FROM `configuration` WHERE `configuration`.`name` = 'backendRunning'";
 	$result = mysqli_query($con,$sql);
 	$array_result = array();
@@ -105,9 +108,12 @@ function isInstalledAlready(){
 	$result = false;
 	$array_result = array();
 	$con = openDB();
+	if(!$con)return false;
 	$dbOptions = getDBOptions();mysqli_select_db($con, $dbOptions["DB"]);
-	$sql = "SELECT * FROM `configuration` WHERE `configuration`.`name` = 'installed';";
+	$sql = "SELECT * FROM `configuration` WHERE `configuration`.`name` = 'installed'";
 	$result = mysqli_query($con,$sql);
+	//echo "result: ".$result;
+	error_log("installed?: ".json_encode($result));
 	while($row = mysqli_fetch_array($result)) {
 		array_push($array_result, $row);
 	}
@@ -445,7 +451,8 @@ function buildNoteItems($notes){
 /** Fetches the Device ID from the database, uses the ip. */
 function getDeviceID($ip){
 	$con = openDB();
-	mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con,$dbOptions["DB"]);
 	$sql="SELECT id FROM `devices` WHERE ip = '".$ip."'";
 	$result = mysqli_query($con,$sql);
 	$id = '';
@@ -458,7 +465,8 @@ function getDeviceID($ip){
 /** Query's the database for the devices name, using the ID. */
 function getDeviceName($deviceID){
 	$con = openDB();
-	mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con, $dbOptions["DB"]);
 	$sql="SELECT name FROM `devices` WHERE id = '".$deviceID."'";
 	$result = mysqli_query($con,$sql);
 	$name = '';
@@ -471,7 +479,8 @@ function getDeviceName($deviceID){
 /** Query's the database for a users name, from their ID. */
 function getUserName($id){
 	$con = openDB();
-	mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con,$dbOptions["DB"]);
 	$sql="SELECT usr FROM `users` WHERE id = '".$id."'";
 	$result = mysqli_query($con,$sql);
 	$name = '';
@@ -484,7 +493,8 @@ function getUserName($id){
 /** Query's the database for a users db id, from their name. */
 function getUserID($name){
 	$con = openDB();
-        mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+        mysqli_select_db($con,$dbOptions["DB"]);
         $sql="SELECT id FROM `users` WHERE usr = '".$name."'";
         $result = mysqli_query($con,$sql);
         $id = '';
@@ -511,11 +521,12 @@ function getFormattedTime($timestamp){
 function submitNote($deviceID, $userID, $time, $noteContent){
 	error_log("submitting submitNote called devid:".$deviceID." userID:".$userID." time:".$time." content:".$noteContent);
 	$con = openDB();
+	$dbOptions = getDBOptions();
 	$sanitizedContent = mysqli_real_escape_string($con, $noteContent);
         //submit note to database
         $resultList = Array(); //the structure we are reading latency results to.
-        mysqli_select_db($con,"hostmon");
-        $sql="INSERT INTO `hostmon`.`notes` (`id` ,`deviceID` ,`userID` ,`timestamp` ,`content`) VALUES (NULL , '".$deviceID."', '".$userID."', '".$time."', '".$sanitizedContent."');";
+        mysqli_select_db($con,$dbOptions['DB']);
+        $sql="INSERT INTO `".$dbOptions['DB']."`.`notes` (`id` ,`deviceID` ,`userID` ,`timestamp` ,`content`) VALUES (NULL , '".$deviceID."', '".$userID."', '".$time."', '".$sanitizedContent."');";
       error_log($sql);
 	  $result2 = mysqli_query($con,$sql);
 
@@ -533,7 +544,8 @@ function buildNotesGrid($notes){
 /** Removes a deviceID from the active_devices table. */
 function removeDevice($id){
 	$con = openDB();
-	mysqli_select_db($con, "hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con, $dbOptions['DB']);
 	$sql="delete from active_devices WHERE deviceId =".$id.";";
 	$result = mysqli_query($con, $sql);
 	$returnArray = Array();
@@ -546,7 +558,8 @@ function removeDevice($id){
 /** Adds a new Device into the db, but does not activate it. */
 function addNewDevice($ip, $name, $note){
 	$con = openDB();
-        mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+        mysqli_select_db($con,$dbOptions['DB']);
         $sql="INSERT into `devices` (`ip`, `name`, `description`) VALUES ('".$ip."', '".$name."', '".$note."');";
         $result = mysqli_query($con,$sql);
         $returnArray = Array();
@@ -558,7 +571,8 @@ function addNewDevice($ip, $name, $note){
 /** Adds given id to active devices table in DB. */
 function makeDeviceActive($id){
 	$con = openDB();
-        mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+        mysqli_select_db($con,$dbOptions['DB']);
         $sql="INSERT into `active_devices` (`deviceId`) VALUES ('".$id."');";
         $result = mysqli_query($con,$sql);
         $returnArray = Array();
@@ -575,7 +589,8 @@ function getAlarm($type){
 		 $id=20;
 	}
 	$con = openDB();
-	mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con,$dbOptions['DB']);
 	$sql="SELECT value FROM `configuration` WHERE id = '".$id."'";
 	$result = mysqli_query($con,$sql);
 	$returnArray = Array();
@@ -594,7 +609,8 @@ function setAlarm($type, $name){
 		$id = 20;
 	}
 	$con = openDB();
-	mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con,$dbOptions['DB']);
 	$sql="update configuration SET value='".$name."' WHERE id=".$id.";";
 	$result = mysqli_query($con,$sql);
 	$returnArray = Array();
@@ -608,7 +624,8 @@ function setAlarm($type, $name){
 /** Returns an Array of notes from the DB, based on deviceID. */
 function getNotes($deviceID){
 	$con = openDB();
-	mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con,$dbOptions['DB']);
 	$sql="SELECT * FROM `notes` WHERE deviceID = '".$deviceID."'";
 	$result = mysqli_query($con,$sql);
 	$returnArray = Array();
@@ -630,7 +647,8 @@ function getNotes($deviceID){
 /* Will Return an array of active devices for the specified username. */
 function getActiveDevices($username){
 	$con = openDB();
-	mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con, $dbOptions['DB']);
 	$sql="SELECT * FROM `active_devices`";
 	$result = mysqli_query($con,$sql);
 	$activeDeviceNumbers = Array(); // a 2d array where the first d is different devices, and the 2nd d has the number at 0
@@ -748,5 +766,135 @@ function getGridPositions($numGrids){
 		array_push($gridPositions, array("yp" => 7,"xp" => 9,"xs" => 4,"ys" => 2));
 	}
 	return $gridPositions;
+
 }
+
+/** Returns a label used as an ID in the install page
+  * Based on what version of php we are using.
+  */
+function getPhpLabelFromVersion($v){
+        $returnLabel = '';
+        if(version_compare($v, '4.0.0', '<')){
+                $returnLabel = "install_red";
+        }else if(version_compare($v, '5.0.0', '<')){
+                $returnLabel = "install_yellow";
+        }else{
+                $returnLabel = "install_green";
+        }
+        return $returnLabel;
+}
+
+/** Returns Verification text used on the install page
+  * Based on whaat version of php we are using.
+  */
+function getPhpTextFromVersion($v){
+        $returnText = '';
+        if(version_compare($v, '4.0.0', '<')){
+                $returnText = $v." is to low";
+        }else if(version_compare($v, '5.0.0', '<')){
+                $returnText = $v." is untested";
+        }else{
+                $returnText = $v." is GOOD";
+        }
+        return $returnText;
+}
+
+function getMySQLVersion() { 
+  $output = shell_exec('mysql -V'); 
+  preg_match('@[0-9]+\.[0-9]+\.[0-9]+@', $output, $version); 
+  return $version[0]; 
+}
+
+function getMySQLTextFromVersion($v){
+	$returnText = '';
+        if(version_compare($v, '4.0.0', '<')){
+                $returnText = $v." is to low";
+        }else if(version_compare($v, '5.0.0', '<')){
+                $returnText = $v." is untested";
+        }else{
+                $returnText = $v." is GOOD";
+        }
+        return $returnText;
+}
+
+function getMySQLLabelFromVersion($v){
+        $returnLabel = '';
+        if(version_compare($v, '4.0.0', '<')){
+                $returnLabel = "install_red";
+        }else if(version_compare($v, '5.0.0', '<')){
+                $returnLabel = "install_yellow";
+        }else{
+                $returnLabel = "install_green";
+        }
+        return $returnLabel;
+}
+
+function getApacheTextFromVersion($v){
+        $returnText = '';
+        if(version_compare($v, '2.0.0', '<')){
+                $returnText = $v." is to low";
+        }else if(version_compare($v, '2.2.0', '<')){
+                $returnText = $v." is untested";
+        }else{
+                $returnText = $v." is GOOD";
+        }
+        return $returnText;
+}
+
+function getApacheLabelFromVersion($v){
+        $returnLabel = '';
+        if(version_compare($v, '2.0.0', '<')){
+                $returnLabel = "install_red";
+        }else if(version_compare($v, '2.2.0', '<')){
+                $returnLabel = "install_yellow";
+        }else{
+                $returnLabel = "install_green";
+        }
+        return $returnLabel;
+}
+
+
+function getMySQLErrorMessageFromNum($n){
+	$errorMsg = '';
+	if($n == 0){
+		$errorMsg = '0: MySQL Settings Are Correct.';
+	}else if($n == 1044){
+		$errorMsg = '1044: The DB Name Is Not Correct.';
+	}else if($n == 1045){
+		$errorMsg = '1045: Username And Or Password Is Not Correct.';
+	}else if($n == 2013 || $n == 2003){
+		$errorMsg = '2013: The DB Address Is Not Correct.';
+	}else if($n == 666){
+		$errorMsg = '666: This user is not a MySQL Admin';
+	}else if($n == 1){
+		$errorMsg = '1: User is an Admin!';
+	}else{
+		$errorMsg = 'Error Num Occured: '.$n;
+	}
+	return $errorMsg;
+}
+
+/**
+  * Sql ErrorType will be used as id's in the frontend
+  * after it is sent there via ajax.
+  */
+function getMySQLErrorTypeFromNum($n){
+	 $errorMsg = '';
+        if($n == 0){
+                $errorMsg = 'addressError';
+        }else if($n == 1044){
+                $errorMsg = 'nameError';
+        }else if($n == 1045){
+                $errorMsg = 'userError';
+        }else if($n == 2013 || $n == 2003){
+                $errorMsg = 'addressError';
+        }else if($n == 666 || $n == 1){
+		$errorMsg = 'adminUsernameError';
+	}else{
+                $errorMsg = 'addressError';
+        }
+        return $errorMsg;
+
+}
+
 ?>

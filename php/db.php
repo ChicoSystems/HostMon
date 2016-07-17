@@ -9,18 +9,21 @@
 /** Create and return the DB connection. */	
 function openDB(){
 	$dbOptions = getDBOptions();
-	$con = mysqli_connect($dbOptions["IP"], $dbOptions["USER"], $dbOptions["PASS"], $dbOptions["DB"]);
+	//$con = mysqli_connect($dbOptions["IP"], $dbOptions["USER"], $dbOptions["PASS"], $dbOptions["DB"]);
+	$con = new mysqli($dbOptions["IP"], $dbOptions["USER"], $dbOptions["PASS"]);
 	if (!$con) {
-		echo getCWD();
-		die(' Could not connect: ' . mysqli_error($con));
+		return false;
+		//echo getCWD();
+		//die(' Could not connect to db: ' . mysqli_error($con));
 	}
-	mysqli_select_db($con,"hostmon");
+	mysqli_select_db($con,$dbOptions["DB"]);
 	return $con;
 }
 
 /** Send A Query to The DB, looking for a single result. */
 function queryDB($con, $sql){
-	mysqli_select_db($con,"hostmon");
+	$dbOptions = getDBOptions();
+	mysqli_select_db($con,$dbOptions["DB"]);
 	$result = mysqli_query($con,$sql);
 	$row = mysqli_fetch_array($result);
 	return $row;
