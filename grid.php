@@ -1117,7 +1117,7 @@ function updateGridGraphData(canvas, x, y){
 						ip:currentIP,
 						timeRange:"hour"};
 		}
-		 console.log(JSON.stringify(postData));
+		 //console.log(JSON.stringify(postData));
 		 // Send the request to the server.
 		$.ajax({
 			type:"POST",

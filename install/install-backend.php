@@ -37,7 +37,7 @@ $_POST['adminPassword'] = '962012d09b8170d912f0669f6d7d9d07';
 
 if(isset($_POST['checkAdminDB'])){
 	$ajaxReturnVal = array();
-	$errorNum = install_testAdminDB();
+	$errorNum = install_testAdminDB($_POST['SQLaddress'], $_POST['SQLadminUsername'], $_POST['SQLadminPassword']);
         $errorMsg = getMySQLErrorMessageFromNum($errorNum);
 
         //echo ":".$errorNum.":";
@@ -97,6 +97,8 @@ if(isset($_POST['checkAdminDB'])){
 		$dbName = $_POST['adminDBName'];
 		$sqlAdmin = $_POST['SQLadminUsername'];
 		$sqlPass = $_POST['SQLadminPassword'];
+		$dbUser = $_POST['dbUser'];
+		$dbPass = $_POST['dbPass'];
 
 		$errorNum = install_testAdminDB($address, $sqlAdmin, $sqlPass);
 		//echo " testAdminDB: ".$errorNum;
@@ -104,8 +106,8 @@ if(isset($_POST['checkAdminDB'])){
 		if($errorNum == 1){//DB is creatable with these creds.
 			$errorNum = createNewDB($address, $dbName, $sqlAdmin, $sqlPass);
 			//echo " createdNewDB: ".$errorNum;
-			$newUsername = testUser;//substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 6);
-			$newPass = testPass; //substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 6);
+			$newUsername = $dbUser;//substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 6);
+			$newPass = $dbPass; //substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 6);
 			$errorNum = createNewSQLUser($address, $dbName, $newUsername, $newPass, $sqlAdmin, $sqlPass);
 			//echo "error: ".$errorNum;
 			
@@ -244,8 +246,9 @@ function setupAdminAccount(){
 function recordDBSettings($dName, $user, $pass, $addr){
         $ajaxReturnVal['errorMessage'] = "Unable to open cfg/db.cfg, problem with permission?";
         $ajaxReturnVal = json_encode($ajaxReturnVal);
-
-	$myfile = fopen("../cfg/db.cfg", "w") or die($ajaxReturnVal);
+    $cwd = getcwd();
+	//$myfile = fopen("../cfg/db.cfg", "w") or die($ajaxReturnVal);
+    $myfile = fopen("../cfg/db.cfg", "w");
 	$txt = "DB:".$dName.";\n";
 	fwrite($myfile, $txt);
 	

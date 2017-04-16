@@ -28,7 +28,9 @@ echo "os is ".$os;
 		pclose(popen($cmd, "r"));
 	}else if($os == 'Lin'){ // start backend on linux
 		$cmd = $javaDir.'java -Djava.awt.headless=true -cp "../backend/:../backend/mysql-connector-java-5.1.31-bin.jar" Hostmon	> /dev/null 2>&1 &';
+		error_log("trying to start java with: ".$cmd, 0);
 		exec($cmd, $output);
+		//error_log($output);
 	}
 	
 	
